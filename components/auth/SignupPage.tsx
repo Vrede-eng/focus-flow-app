@@ -1,14 +1,14 @@
+
 import React, { useState, useMemo } from 'react';
 import AgreementModal from '../common/AgreementModal';
 
 interface SignupPageProps {
-    onSignup: (name: string, email: string, password: string) => Promise<string | null>;
+    onSignup: (name: string, password: string) => Promise<string | null>;
     switchToLogin: () => void;
 }
 
 const SignupPage: React.FC<SignupPageProps> = ({ onSignup, switchToLogin }) => {
     const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [nameError, setNameError] = useState('');
@@ -58,7 +58,7 @@ const SignupPage: React.FC<SignupPageProps> = ({ onSignup, switchToLogin }) => {
     const handleAgreeAndSignup = async () => {
         setShowAgreement(false);
         setIsLoading(true);
-        const errorMessage = await onSignup(name, email, password);
+        const errorMessage = await onSignup(name, password);
         setIsLoading(false);
         if (errorMessage) {
             setError(errorMessage);
@@ -97,22 +97,6 @@ const SignupPage: React.FC<SignupPageProps> = ({ onSignup, switchToLogin }) => {
                             aria-describedby="name-error"
                         />
                         {nameError && <p id="name-error" className="text-red-500 text-xs mt-1">{nameError}</p>}
-                    </div>
-                     <div>
-                        <input
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            placeholder="Email"
-                            className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition"
-                             style={{
-                                backgroundColor: 'var(--color-bg-secondary)', 
-                                color: 'var(--color-text-primary)',
-                                borderColor: hasError ? '#f43f5e' : 'var(--color-bg-tertiary)',
-                            }}
-                            required
-                            disabled={isLoading}
-                        />
                     </div>
                     <div>
                         <input
