@@ -1,0 +1,7 @@
+{
+  "name": "FocusFlow - Study Tracker",
+  "description": "A modern and beautiful study tracking application to help you build focus and consistency. Log your study hours, level up, and maintain your streak to achieve your learning goals.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

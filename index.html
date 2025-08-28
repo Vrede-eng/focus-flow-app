@@ -1,0 +1,54 @@
+<script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/",
+    "react/": "https://aistudiocdn.com/react@^19.1.1/",
+    "react": "https://aistudiocdn.com/react@^19.1.1",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.16.0"
+  }
+}
+</script>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FocusFlow</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Inter:wght@400;500;600;700;800&family=Share+Tech+Mono&family=Press+Start+2P&family=VT323&family=Bungee&family=Major+Mono+Display&family=Orbitron:wght@700&display=swap" rel="stylesheet">
+    <style>
+      body {
+        font-family: var(--font-family-main, 'Inter', sans-serif);
+        background-color: var(--color-bg-primary);
+        color: var(--color-text-primary);
+        transition: background-color 0.3s ease, color 0.3s ease, font-family 0.3s ease;
+      }
+      input::placeholder, textarea::placeholder {
+        color: var(--color-text-placeholder);
+        opacity: 1; /* Firefox */
+      }
+      :root {
+        /* Default Theme: Blue */
+        --color-bg-primary: #0f172a;
+        --color-bg-secondary: #1e293b;
+        --color-bg-tertiary: #334155;
+        --color-text-primary: #e2e8f0;
+        --color-text-secondary: #94a3b8;
+        --color-text-placeholder: #64748b;
+        --gradient-accent: linear-gradient(to right, #2563eb, #3b82f6);
+        --color-accent-primary: #3b82f6;
+        --font-family-main: 'Inter', sans-serif;
+      }
+      .gold-username {
+          background: linear-gradient(to right, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          animation: gold-shine 2.5s infinite;
+          font-weight: bold;
+      }
+
+      @keyframes gold-shine {
+          0% { text-shadow: 0 0 3px rgba(252, 246, 186, 0.5), 0 0 5px rgba(255, 215, 0, 0.5); }
+          50% { text-shadow: 
