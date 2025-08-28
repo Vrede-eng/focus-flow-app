@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { User, Clan, ClanChatMessage } from '../../types';
 import Avatar from '../common/Avatar';
@@ -50,13 +49,13 @@ const ClanChatView: React.FC<ClanChatViewProps> = ({ currentUser, clan, allUsers
 
             <main className="flex-grow overflow-y-auto p-4 space-y-2">
                 {messages.map(msg => {
-                    const isCurrentUser = msg.from === currentUser.name;
-                    const sender = getSender(msg.from);
+                    const isCurrentUser = msg.from_name === currentUser.name;
+                    const sender = getSender(msg.from_name);
                     return (
                         <div key={msg.id} className={`flex items-start gap-2 ${isCurrentUser ? 'justify-end' : 'justify-start'}`}>
                              {!isCurrentUser && sender && (
                                  <button onClick={() => onViewProfile(sender.name)}>
-                                    <Avatar profilePic={sender.profilePic} className="h-8 w-8 mt-1" />
+                                    <Avatar profilePic={sender.profile_pic} className="h-8 w-8 mt-1" />
                                  </button>
                              )}
                             <div className={`max-w-[80%] px-4 py-2 rounded-2xl ${isCurrentUser ? 'text-white rounded-br-lg' : 'rounded-bl-lg'}`}
@@ -64,7 +63,7 @@ const ClanChatView: React.FC<ClanChatViewProps> = ({ currentUser, clan, allUsers
                                     background: isCurrentUser ? 'var(--gradient-accent)' : 'var(--color-bg-secondary)',
                                     color: isCurrentUser ? 'white' : 'var(--color-text-primary)'
                                  }}>
-                                {!isCurrentUser && <p className="text-xs font-bold" style={{color: 'var(--color-accent-primary)'}}>{msg.from}</p>}
+                                {!isCurrentUser && <p className="text-xs font-bold" style={{color: 'var(--color-accent-primary)'}}>{msg.from_name}</p>}
                                 <p className="whitespace-pre-wrap break-words">{msg.text}</p>
                                 <p className="text-xs opacity-70 mt-1 text-right">{new Date(msg.timestamp).toLocaleTimeString([], {timeZone: currentUser.timezone, hour: '2-digit', minute:'2-digit'})}</p>
                             </div>

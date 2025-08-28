@@ -232,7 +232,8 @@ const AIAssistantPage: React.FC<AIAssistantPageProps> = (props) => {
                              }}>
                             <p className="whitespace-pre-wrap break-words">{msg.text}</p>
                         </div>
-                         {msg.role === 'user' && <Avatar profilePic={currentUser.profilePic} equippedFrame={currentUser.equippedFrame} equippedHat={currentUser.equippedHat} equippedPet={currentUser.equippedPet} className="h-8 w-8" />}
+                         {/* FIX: Changed camelCase props to snake_case */}
+                         {msg.role === 'user' && <Avatar profilePic={currentUser.profile_pic} equippedFrame={currentUser.equipped_frame} equippedHat={currentUser.equipped_hat} equippedPet={currentUser.equipped_pet} className="h-8 w-8" />}
                     </div>
                 ))}
                 {isLoading && (

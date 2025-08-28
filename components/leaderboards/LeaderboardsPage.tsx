@@ -10,7 +10,8 @@ type Metric = 'xp' | 'hours' | 'streak' | 'prestige' | 'level';
 type Period = 'daily' | 'weekly' | 'all-time';
 type Scope = 'global' | 'friends' | 'clans';
 
-interface UserLeaderboardEntry extends Pick<User, 'name' | 'profilePic' | 'level' | 'isPrivate' | 'equippedTitle' | 'equippedFrame' | 'equippedHat' | 'equippedPet' | 'customPetUrl' | 'usernameColor' | 'equippedFont'> {
+// FIX: Changed property names from camelCase to snake_case to match User type
+interface UserLeaderboardEntry extends Pick<User, 'name' | 'profile_pic' | 'level' | 'is_private' | 'equipped_title' | 'equipped_frame' | 'equipped_hat' | 'equipped_pet' | 'custom_pet_url' | 'username_color' | 'equipped_font'> {
     score: number;
 }
 interface ClanLeaderboardEntry {
@@ -72,9 +73,11 @@ const LeaderboardsPage: React.FC<LeaderboardsPageProps> = ({ currentUser, allUse
                     }
                     if (period === 'all-time') {
                         if (metric === 'xp') totalScore += member.xp;
-                        else totalScore += member.studyLog.reduce((s, l) => s + l.hours, 0);
+                        // FIX: Changed studyLog to study_log to match User type
+                        else totalScore += member.study_log.reduce((s, l) => s + l.hours, 0);
                     } else {
-                        const relevantLogs = member.studyLog.filter(log => {
+                        // FIX: Changed studyLog to study_log to match User type
+                        const relevantLogs = member.study_log.filter(log => {
                             if (period === 'daily') return log.date === todayStr;
                             if (period === 'weekly') return log.date >= startOfWeekStr;
                             return false;
@@ -111,8 +114,9 @@ const LeaderboardsPage: React.FC<LeaderboardsPageProps> = ({ currentUser, allUse
             ? nonAdminUsers.filter(u => u.name === currentUser.name || currentUser.friends.includes(u.name))
             : nonAdminUsers;
 
+        // FIX: Changed property names from camelCase to snake_case to match User type
         const mapUserToEntry = (user: User, score: number): UserLeaderboardEntry => ({
-            name: user.name, profilePic: user.profilePic, score, level: user.level, isPrivate: user.isPrivate, equippedTitle: user.equippedTitle || user.title, equippedFrame: user.equippedFrame, equippedHat: user.equippedHat, equippedPet: user.equippedPet, customPetUrl: user.customPetUrl, usernameColor: user.usernameColor, equippedFont: user.equippedFont,
+            name: user.name, profile_pic: user.profile_pic, score, level: user.level, is_private: user.is_private, equipped_title: user.equipped_title || user.title, equipped_frame: user.equipped_frame, equipped_hat: user.equipped_hat, equipped_pet: user.equipped_pet, custom_pet_url: user.custom_pet_url, username_color: user.username_color, equipped_font: user.equipped_font,
         });
 
         if (metric === 'prestige') {
@@ -134,9 +138,11 @@ const LeaderboardsPage: React.FC<LeaderboardsPageProps> = ({ currentUser, allUse
             let score: number;
             if (period === 'all-time') {
                 if (metric === 'xp') score = user.xp;
-                else score = user.studyLog.reduce((sum, log) => sum + log.hours, 0);
+                // FIX: Changed studyLog to study_log to match User type
+                else score = user.study_log.reduce((sum, log) => sum + log.hours, 0);
             } else {
-                const relevantLogs = user.studyLog.filter(log => {
+                // FIX: Changed studyLog to study_log to match User type
+                const relevantLogs = user.study_log.filter(log => {
                     if (period === 'daily') return log.date === todayStr;
                     if (period === 'weekly') return log.date >= startOfWeekStr;
                     return false;
@@ -257,15 +263,19 @@ const LeaderboardsPage: React.FC<LeaderboardsPageProps> = ({ currentUser, allUse
                         const userEntry = entry as UserLeaderboardEntry;
                         const isFriend = currentUser.friends.includes(userEntry.name);
                         const isCurrentUser = userEntry.name === currentUser.name;
-                        const isPrivateAndNotFriend = userEntry.isPrivate && !isFriend && !isCurrentUser && scope === 'global';
+                        // FIX: Changed isPrivate to is_private
+                        const isPrivateAndNotFriend = userEntry.is_private && !isFriend && !isCurrentUser && scope === 'global';
                         const displayName = isPrivateAndNotFriend ? '(private account)' : userEntry.name;
                         
-                        const isGold = userEntry.usernameColor === '#FFD700';
+                        // FIX: Changed usernameColor to username_color
+                        const isGold = userEntry.username_color === '#FFD700';
                         const usernameStyle: React.CSSProperties = {
-                            fontFamily: userEntry.equippedFont ? FONTS[userEntry.equippedFont]?.family : 'inherit',
+                            // FIX: Changed equippedFont to equipped_font
+                            fontFamily: userEntry.equipped_font ? FONTS[userEntry.equipped_font]?.family : 'inherit',
                         };
                          if (!isGold) {
-                            usernameStyle.color = userEntry.usernameColor || 'var(--color-text-primary)';
+                            // FIX: Changed usernameColor to username_color
+                            usernameStyle.color = userEntry.username_color || 'var(--color-text-primary)';
                         }
 
                         return (
@@ -273,11 +283,13 @@ const LeaderboardsPage: React.FC<LeaderboardsPageProps> = ({ currentUser, allUse
                                  style={{ backgroundColor: isCurrentUser ? 'color-mix(in srgb, var(--color-accent-primary) 25%, transparent)' : 'var(--color-bg-secondary)', borderColor: isCurrentUser ? 'var(--color-accent-primary)' : 'transparent' }}>
                                 <div className="flex items-center space-x-4 truncate">
                                     <span className="font-bold text-lg w-8 text-center" style={{ color: 'var(--color-text-secondary)' }}>{index + 1}</span>
-                                    <Avatar profilePic={userEntry.profilePic} equippedFrame={userEntry.equippedFrame} equippedHat={userEntry.equippedHat} equippedPet={userEntry.equippedPet} customPetUrl={userEntry.customPetUrl} className="h-10 w-10" />
+                                    {/* FIX: Changed camelCase props to snake_case */}
+                                    <Avatar profilePic={userEntry.profile_pic} equippedFrame={userEntry.equipped_frame} equippedHat={userEntry.equipped_hat} equippedPet={userEntry.equipped_pet} customPetUrl={userEntry.custom_pet_url} className="h-10 w-10" />
                                     <div className="truncate">
                                         <p className={`font-semibold truncate ${isGold ? 'gold-username' : ''}`} style={usernameStyle}>{displayName}</p>
-                                        {userEntry.equippedTitle && !isPrivateAndNotFriend && (
-                                            <p className="text-xs truncate" style={{color: 'var(--color-accent-primary)'}}>{userEntry.equippedTitle}</p>
+                                        {/* FIX: Changed equippedTitle to equipped_title */}
+                                        {userEntry.equipped_title && !isPrivateAndNotFriend && (
+                                            <p className="text-xs truncate" style={{color: 'var(--color-accent-primary)'}}>{userEntry.equipped_title}</p>
                                         )}
                                     </div>
                                 </div>

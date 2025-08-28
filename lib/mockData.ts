@@ -1,4 +1,5 @@
 
+
 import { User } from '../types';
 import { PREDEFINED_AVATARS } from './avatars';
 import { determineTitle, totalXpToReachLevel } from './levels';
@@ -40,36 +41,38 @@ const calculateStats = (studyLog: { date: string, hours: number }[]) => {
 };
 
 export const createAdminUser = (): User => {
-    const adminUser: Omit<User, 'hash'> = {
+    // FIX: Removed 'password' which is not in User type. Changed type to User.
+    const adminUser: User = {
+        id: 'admin-user-id',
         name: 'ADMIN',
-        password: 'Leo12345',
-        profilePic: 'avatar-20', // A distinct avatar
+        profile_pic: 'avatar-20', // A distinct avatar
         level: 99,
         xp: 999999,
         streak: 999,
-        lastStudiedDate: null,
-        studyLog: [],
+        last_studied_date: null,
+        study_log: [],
         friends: [],
-        friendRequests: [],
+        friend_requests: [],
         timezone: 'UTC',
         theme: 'matrix',
         title: 'System Administrator',
         status: 'Overseeing the system.',
-        isPrivate: true,
-        weeklyGoals: {
+        is_private: true,
+        weekly_goals: {
             weekIdentifier: getWeekIdentifier(new Date(), 'UTC'),
             goals: []
         },
         achievements: [],
-        totalGoalsCompleted: 0,
-        createdAt: Date.now(),
+        total_goals_completed: 0,
+        created_at: String(Date.now()),
         isAdmin: true,
         prestige: 0,
         coins: 1000000,
         inventory: { streakShield: 1 },
         unlocks: ['*'], // Admin has everything unlocked
     };
-    return { ...adminUser, hash: generateDataHash(adminUser as User) };
+    // FIX: Removed 'hash' which is not in User type.
+    return { ...adminUser };
 };
 
 export const generateMockUsers = (): User[] => {
@@ -91,29 +94,30 @@ export const generateMockUsers = (): User[] => {
         const creationDate = new Date();
         creationDate.setDate(creationDate.getDate() - Math.floor(Math.random() * 90));
 
-        const user: Omit<User, 'hash'> = {
+        // FIX: Removed 'password' which is not in User type. Changed property names to snake_case.
+        const user: User = {
+            id: `mock-user-${i}`,
             name,
-            password: 'password123',
-            profilePic: PREDEFINED_AVATARS[i % PREDEFINED_AVATARS.length],
+            profile_pic: PREDEFINED_AVATARS[i % PREDEFINED_AVATARS.length],
             level,
             xp,
             streak,
-            lastStudiedDate,
-            studyLog,
+            last_studied_date: lastStudiedDate,
+            study_log: studyLog,
             friends: [],
-            friendRequests: [],
+            friend_requests: [],
             timezone: timezone,
             theme: 'blue',
             title: determineTitle(level, 0),
             status: statuses[i % statuses.length],
-            isPrivate: Math.random() < 0.2,
-            weeklyGoals: {
+            is_private: Math.random() < 0.2,
+            weekly_goals: {
                 weekIdentifier: getWeekIdentifier(new Date(), timezone),
                 goals: generateNewWeeklyGoals()
             },
             achievements: [],
-            totalGoalsCompleted: Math.floor(Math.random() * 20),
-            createdAt: creationDate.getTime(),
+            total_goals_completed: Math.floor(Math.random() * 20),
+            created_at: String(creationDate.getTime()),
             isAdmin: false,
             prestige: 0,
             coins: Math.round(totalHours * 100 * (Math.random() * 0.5 + 0.25)), // Have spent some coins
@@ -124,9 +128,9 @@ export const generateMockUsers = (): User[] => {
             ],
         };
 
+        // FIX: Removed 'hash' which is not in User type.
         users.push({
             ...user,
-            hash: generateDataHash(user as User),
         });
     }
 
@@ -144,5 +148,6 @@ export const generateMockUsers = (): User[] => {
     }
     
     // Re-hash users after adding friends
-    return users.map(u => ({ ...u, hash: generateDataHash(u) }));
+    // FIX: Removed 'hash' logic.
+    return users.map(u => ({ ...u }));
 };

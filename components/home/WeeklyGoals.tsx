@@ -22,7 +22,8 @@ interface WeeklyGoalsProps {
 
 const WeeklyGoals: React.FC<WeeklyGoalsProps> = ({ user }) => {
     const [timeLeft, setTimeLeft] = useState('');
-    const goals = user.weeklyGoals?.goals || [];
+    // FIX: Changed weeklyGoals to weekly_goals to match User type
+    const goals = user.weekly_goals?.goals || [];
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -68,7 +69,7 @@ const WeeklyGoals: React.FC<WeeklyGoalsProps> = ({ user }) => {
                                     border: goal.completed ? 'none' : '2px solid var(--color-text-secondary)'
                                  }}>
                                 {goal.completed && (
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                                     </svg>
                                 )}

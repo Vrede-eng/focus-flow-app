@@ -1,4 +1,5 @@
 
+
 import { User } from '../types';
 
 // A simple, non-cryptographic hash function for data integrity checks.
@@ -20,40 +21,43 @@ const CLIENT_SIDE_SECRET = 'focus-flow-integrity-key';
 export const generateDataHash = (user: User): string => {
   // We select the key fields that determine a user's progress.
   // We stringify them to ensure consistent formatting.
+  // FIX: Changed all property names from camelCase to snake_case to match User type
   const dataToHash = JSON.stringify({
     name: user.name,
     level: user.level,
     xp: user.xp,
     streak: user.streak,
-    lastStudiedDate: user.lastStudiedDate,
-    studyLog: user.studyLog,
+    last_studied_date: user.last_studied_date,
+    study_log: user.study_log,
     achievements: user.achievements,
     friends: user.friends,
-    createdAt: user.createdAt,
+    created_at: user.created_at,
     prestige: user.prestige,
     // Shop data
     coins: user.coins,
     inventory: user.inventory,
     unlocks: user.unlocks,
-    equippedFrame: user.equippedFrame,
-    equippedHat: user.equippedHat,
-    equippedPet: user.equippedPet,
-    customPetUrl: user.customPetUrl,
-    profileTheme: user.profileTheme,
-    equippedFont: user.equippedFont,
-    usernameColor: user.usernameColor,
+    equipped_frame: user.equipped_frame,
+    equipped_hat: user.equipped_hat,
+    equipped_pet: user.equipped_pet,
+    custom_pet_url: user.custom_pet_url,
+    profile_theme: user.profile_theme,
+    equipped_font: user.equipped_font,
+    username_color: user.username_color,
   });
 
   return simpleHash(dataToHash + CLIENT_SIDE_SECRET);
 };
 
 export const verifyDataHash = (user: User): boolean => {
+  // FIX: Accessing user.hash which is now an optional property on User type.
   if (!user.hash) {
     // If a user object from an older version has no hash, we can either
     // trust it or reject it. For now, we'll reject it to enforce security.
     return false;
   }
   const expectedHash = generateDataHash(user);
+  // FIX: Accessing user.hash which is now an optional property on User type.
   return user.hash === expectedHash;
 };
 

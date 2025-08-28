@@ -2,12 +2,13 @@ import React, { useState, useMemo } from 'react';
 import AgreementModal from '../common/AgreementModal';
 
 interface SignupPageProps {
-    onSignup: (name: string, password: string) => Promise<string | null>;
+    onSignup: (name: string, email: string, password: string) => Promise<string | null>;
     switchToLogin: () => void;
 }
 
 const SignupPage: React.FC<SignupPageProps> = ({ onSignup, switchToLogin }) => {
     const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [nameError, setNameError] = useState('');
@@ -21,7 +22,10 @@ const SignupPage: React.FC<SignupPageProps> = ({ onSignup, switchToLogin }) => {
         // Basic real-time validation for UX
         if (newName && !/^[a-zA-Z0-9 ]+$/.test(newName)) {
             setNameError('Name can only contain letters, numbers, and spaces.');
-        } else {
+        } else if (newName.length > 20) {
+            setNameError('Name must be 20 characters or less.');
+        }
+        else {
             setNameError('');
         }
     };
@@ -39,8 +43,8 @@ const SignupPage: React.FC<SignupPageProps> = ({ onSignup, switchToLogin }) => {
             setError("Please enter a name.");
             return;
         }
-        if (password.length < 4) {
-            setError("Password must be at least 4 characters long.");
+        if (password.length < 6) {
+            setError("Password must be at least 6 characters long.");
             return;
         }
         if (password !== confirmPassword) {
@@ -54,7 +58,7 @@ const SignupPage: React.FC<SignupPageProps> = ({ onSignup, switchToLogin }) => {
     const handleAgreeAndSignup = async () => {
         setShowAgreement(false);
         setIsLoading(true);
-        const errorMessage = await onSignup(name, password);
+        const errorMessage = await onSignup(name, email, password);
         setIsLoading(false);
         if (errorMessage) {
             setError(errorMessage);
@@ -80,7 +84,7 @@ const SignupPage: React.FC<SignupPageProps> = ({ onSignup, switchToLogin }) => {
                             type="text"
                             value={name}
                             onChange={handleNameChange}
-                            placeholder="Name"
+                            placeholder="Display Name"
                             className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition"
                             style={{
                                 backgroundColor: 'var(--color-bg-secondary)', 
@@ -94,12 +98,28 @@ const SignupPage: React.FC<SignupPageProps> = ({ onSignup, switchToLogin }) => {
                         />
                         {nameError && <p id="name-error" className="text-red-500 text-xs mt-1">{nameError}</p>}
                     </div>
+                     <div>
+                        <input
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="Email"
+                            className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition"
+                             style={{
+                                backgroundColor: 'var(--color-bg-secondary)', 
+                                color: 'var(--color-text-primary)',
+                                borderColor: hasError ? '#f43f5e' : 'var(--color-bg-tertiary)',
+                            }}
+                            required
+                            disabled={isLoading}
+                        />
+                    </div>
                     <div>
                         <input
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            placeholder="Password (min. 4 characters)"
+                            placeholder="Password (min. 6 characters)"
                             className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition"
                              style={{
                                 backgroundColor: 'var(--color-bg-secondary)', 

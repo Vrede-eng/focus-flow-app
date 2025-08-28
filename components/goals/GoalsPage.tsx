@@ -65,7 +65,8 @@ const ActivityGraph: React.FC<{ user: User; view: GraphView; period: GraphPeriod
                 };
             });
     
-            for (const log of user.studyLog) {
+            // FIX: Changed studyLog to study_log to match User type
+            for (const log of user.study_log) {
                 const logDateStr = log.date.split('T')[0];
                 const dayData = days.find(d => d.dateStr === logDateStr);
                 if (dayData) {
@@ -88,7 +89,8 @@ const ActivityGraph: React.FC<{ user: User; view: GraphView; period: GraphPeriod
             const firstDayOfMonthStr = firstDayOfMonth.toISOString().split('T')[0];
             const lastDayOfMonthStr = lastDayOfMonth.toISOString().split('T')[0];
 
-            const monthlyLogs = user.studyLog.filter(log => {
+            // FIX: Changed studyLog to study_log to match User type
+            const monthlyLogs = user.study_log.filter(log => {
                 const logDate = log.date.split('T')[0];
                 return logDate >= firstDayOfMonthStr && logDate <= lastDayOfMonthStr;
             });
@@ -114,7 +116,8 @@ const ActivityGraph: React.FC<{ user: User; view: GraphView; period: GraphPeriod
             }
             return weeks;
         }
-    }, [user.studyLog, user.timezone, view, period]);
+    // FIX: Changed studyLog to study_log to match User type
+    }, [user.study_log, user.timezone, view, period]);
     
     const maxValue = useMemo(() => {
         if (chartData.length === 0) return 1;
@@ -196,7 +199,8 @@ const GoalsPage: React.FC<GoalsPageProps> = ({ user }) => {
             </div>
 
             <div className="grid grid-cols-1 gap-8 items-start">
-                <CalendarHeatmap studyLog={user.studyLog} timezone={user.timezone || 'UTC'} />
+                {/* FIX: Changed studyLog to study_log to match User type */}
+                <CalendarHeatmap studyLog={user.study_log} timezone={user.timezone || 'UTC'} />
             </div>
         </div>
     );

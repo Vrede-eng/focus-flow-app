@@ -1,4 +1,5 @@
 
+
 import React, { useState, useRef, useEffect } from 'react';
 import { AIMessage, User } from '../../types';
 import Avatar from '../common/Avatar';
@@ -95,7 +96,8 @@ const AIPlannerPage: React.FC<AIPlannerPageProps> = ({ messages, onSendMessage, 
                              }}>
                             <p className="whitespace-pre-wrap break-words">{msg.text}</p>
                         </div>
-                         {msg.role === 'user' && <Avatar profilePic={currentUser.profilePic} equippedFrame={currentUser.equippedFrame} equippedHat={currentUser.equippedHat} equippedPet={currentUser.equippedPet} className="h-8 w-8" />}
+{/* FIX: Changed camelCase props on currentUser to snake_case to match User type. */}
+                         {msg.role === 'user' && <Avatar profilePic={currentUser.profile_pic} equippedFrame={currentUser.equipped_frame} equippedHat={currentUser.equipped_hat} equippedPet={currentUser.equipped_pet} customPetUrl={currentUser.custom_pet_url} className="h-8 w-8" />}
                     </div>
                 ))}
                 {isLoading && (

@@ -20,7 +20,8 @@ const UserEditModal: React.FC<UserEditModalProps> = ({ user, onClose, onSave }) 
     const [streak, setStreak] = useState(user.streak.toString());
     const [prestige, setPrestige] = useState((user.prestige || 0).toString());
     const [coins, setCoins] = useState((user.coins || 0).toString());
-    const [equippedTitle, setEquippedTitle] = useState(user.equippedTitle || '');
+    // FIX: Changed equippedTitle to equipped_title
+    const [equippedTitle, setEquippedTitle] = useState(user.equipped_title || '');
 
 
     React.useEffect(() => {
@@ -179,7 +180,8 @@ const AdminPage: React.FC<AdminPageProps> = ({ allUsers, allClans, currentUser, 
         // DAU (Daily Active Users) for the last 30 days
         const dailyActivity = new Map<string, Set<string>>();
         nonAdminUsers.forEach(user => {
-            user.studyLog.forEach(log => {
+            // FIX: Changed studyLog to study_log
+            user.study_log.forEach(log => {
                 const dateStr = log.date.split('T')[0];
                 if (!dailyActivity.has(dateStr)) {
                     dailyActivity.set(dateStr, new Set());
@@ -200,7 +202,8 @@ const AdminPage: React.FC<AdminPageProps> = ({ allUsers, allClans, currentUser, 
         // MAU (Monthly Active Users) for the last 12 months
         const monthlyActivity = new Map<string, Set<string>>();
         nonAdminUsers.forEach(user => {
-            user.studyLog.forEach(log => {
+            // FIX: Changed studyLog to study_log
+            user.study_log.forEach(log => {
                 const monthStr = log.date.substring(0, 7); // 'YYYY-MM'
                 if (!monthlyActivity.has(monthStr)) {
                     monthlyActivity.set(monthStr, new Set());
@@ -221,8 +224,9 @@ const AdminPage: React.FC<AdminPageProps> = ({ allUsers, allClans, currentUser, 
         // New Users for the last 30 days
         const dailySignups = new Map<string, number>();
         nonAdminUsers.forEach(user => {
-            if (user.createdAt) {
-                const date = new Date(user.createdAt);
+            // FIX: Changed createdAt to created_at
+            if (user.created_at) {
+                const date = new Date(user.created_at);
                 const dateStr = date.toISOString().split('T')[0];
                 dailySignups.set(dateStr, (dailySignups.get(dateStr) || 0) + 1);
             }
@@ -266,7 +270,8 @@ const AdminPage: React.FC<AdminPageProps> = ({ allUsers, allClans, currentUser, 
                                     <div key={user.name} className="p-3 rounded-xl" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center space-x-3 truncate">
-                                                <Avatar profilePic={user.profilePic} className="h-10 w-10" />
+                                                {/* FIX: Changed profilePic to profile_pic */}
+                                                <Avatar profilePic={user.profile_pic} className="h-10 w-10" />
                                                 <div className="truncate">
                                                     <p className="font-semibold truncate">{user.name}</p>
                                                     <p className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>P: {user.prestige || 0} | Lvl: {user.level} | Str: {user.streak} | Coins: {(user.coins || 0).toLocaleString()}</p>

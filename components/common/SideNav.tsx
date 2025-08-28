@@ -1,6 +1,4 @@
 
-
-
 import React from 'react';
 import { Tab } from '../../constants';
 import { User } from '../../types';
@@ -53,42 +51,60 @@ const SideNavItem: React.FC<{
 
 const SideNav: React.FC<SideNavProps> = ({ activeTab, setActiveTab, currentUser, hasNotifications, onLogout, onViewProfile }) => {
     
-    const isGold = currentUser.usernameColor === '#FFD700';
+    // FIX: Changed usernameColor to username_color
+    const isGold = currentUser.username_color === '#FFD700';
     const usernameStyle: React.CSSProperties = {
-        fontFamily: currentUser.equippedFont ? FONTS[currentUser.equippedFont]?.family : 'inherit',
+        // FIX: Changed equippedFont to equipped_font
+        fontFamily: currentUser.equipped_font ? FONTS[currentUser.equipped_font]?.family : 'inherit',
     };
      if (!isGold) {
-        usernameStyle.color = currentUser.usernameColor || 'var(--color-text-primary)';
+        // FIX: Changed usernameColor to username_color
+        usernameStyle.color = currentUser.username_color || 'var(--color-text-primary)';
+    }
+    
+    const navItems = [
+        { tab: Tab.Home, icon: <HomeIcon isActive={activeTab === Tab.Home} />, label: 'Home' },
+        { tab: Tab.Friends, icon: <FriendsIcon isActive={activeTab === Tab.Friends} />, label: 'Friends', notification: hasNotifications },
+        { tab: Tab.Challenges, icon: <TrophyIcon isActive={activeTab === Tab.Challenges} />, label: 'Challenges' },
+        { tab: Tab.AIAssistant, icon: <AIAssistantIcon isActive={activeTab === Tab.AIAssistant} />, label: 'AI Assistant' },
+        { tab: Tab.Leaderboards, icon: <LeaderboardIcon isActive={activeTab === Tab.Leaderboards} />, label: 'Leaderboards' },
+        { tab: Tab.Shop, icon: <ShopIcon isActive={activeTab === Tab.Shop} />, label: 'Shop' },
+        { tab: Tab.Settings, icon: <SettingsIcon isActive={activeTab === Tab.Settings} />, label: 'Settings' },
+    ];
+
+    if (currentUser.isAdmin) {
+        navItems.push({ tab: Tab.Admin, icon: <AdminIcon isActive={activeTab === Tab.Admin} />, label: 'Admin' });
     }
 
     return (
         <aside className="w-64 flex-shrink-0 flex-col p-4 border-r h-full hidden md:flex" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-bg-tertiary)' }}>
-            <div className="text-2xl font-bold mb-8 pl-2" style={{ color: 'var(--color-text-primary)' }}>FocusFlow</div>
-
-            <nav className="flex-grow space-y-1">
-                <SideNavItem icon={<HomeIcon isActive={activeTab === Tab.Home}/>} label="Home" isActive={activeTab === Tab.Home} onClick={() => setActiveTab(Tab.Home)} />
-                <SideNavItem icon={<FriendsIcon isActive={activeTab === Tab.Friends}/>} label="Friends" isActive={activeTab === Tab.Friends} onClick={() => setActiveTab(Tab.Friends)} hasNotification={hasNotifications} />
-                <SideNavItem icon={<TrophyIcon isActive={activeTab === Tab.Challenges}/>} label="Challenges" isActive={activeTab === Tab.Challenges} onClick={() => setActiveTab(Tab.Challenges)} />
-                <SideNavItem icon={<AIAssistantIcon isActive={activeTab === Tab.AIAssistant}/>} label="AI Assistant" isActive={activeTab === Tab.AIAssistant} onClick={() => setActiveTab(Tab.AIAssistant)} />
-                <SideNavItem icon={<LeaderboardIcon isActive={activeTab === Tab.Leaderboards}/>} label="Leaders" isActive={activeTab === Tab.Leaderboards} onClick={() => setActiveTab(Tab.Leaderboards)} />
-                <SideNavItem icon={<ShopIcon isActive={activeTab === Tab.Shop}/>} label="Shop" isActive={activeTab === Tab.Shop} onClick={() => setActiveTab(Tab.Shop)} />
-                <SideNavItem icon={<SettingsIcon isActive={activeTab === Tab.Settings}/>} label="Settings" isActive={activeTab === Tab.Settings} onClick={() => setActiveTab(Tab.Settings)} />
-                {currentUser.isAdmin && (
-                    <SideNavItem icon={<AdminIcon isActive={activeTab === Tab.Admin} />} label="Admin" isActive={activeTab === Tab.Admin} onClick={() => setActiveTab(Tab.Admin)} />
-                )}
-            </nav>
-
-            <div className="mt-auto pt-4 border-t" style={{ borderColor: 'var(--color-bg-tertiary)' }}>
-                 <button onClick={onViewProfile} className="flex items-center space-x-3 w-full p-2 rounded-lg hover:bg-white/10 transition-colors text-left">
-                    <Avatar profilePic={currentUser.profilePic} equippedFrame={currentUser.equippedFrame} equippedHat={currentUser.equippedHat} equippedPet={currentUser.equippedPet} customPetUrl={currentUser.customPetUrl} className="h-10 w-10" />
-                    <div className="truncate">
-                        <p className={`font-semibold text-sm truncate ${isGold ? 'gold-username' : ''}`} style={usernameStyle}>{currentUser.name}</p>
-                        <p className="text-xs truncate" style={{color: 'var(--color-text-secondary)'}}>View Profile</p>
+            <div className="flex-1 flex flex-col space-y-8">
+                <button onClick={onViewProfile} className="flex items-center space-x-3 text-left hover:opacity-80 transition-opacity">
+                    {/* FIX: Changed camelCase props to snake_case */}
+                    <Avatar profilePic={currentUser.profile_pic} equippedFrame={currentUser.equipped_frame} equippedHat={currentUser.equipped_hat} equippedPet={currentUser.equipped_pet} customPetUrl={currentUser.custom_pet_url} className="h-12 w-12" />
+                    <div>
+                        <h2 className={`font-bold text-lg truncate ${isGold ? 'gold-username' : ''}`} style={usernameStyle}>{currentUser.name}</h2>
+                        {/* FIX: Changed equippedTitle to equipped_title */}
+                        <p className="text-xs truncate" style={{color: 'var(--color-accent-primary)'}}>{currentUser.equipped_title || currentUser.title}</p>
                     </div>
                 </button>
-                <button onClick={onLogout} className="flex items-center space-x-4 w-full p-3 rounded-lg hover:bg-white/10 transition-colors text-left mt-2">
+                <nav className="space-y-2">
+                    {navItems.map(item => (
+                        <SideNavItem
+                            key={item.tab}
+                            icon={item.icon}
+                            label={item.label}
+                            isActive={activeTab === item.tab}
+                            onClick={() => setActiveTab(item.tab)}
+                            hasNotification={item.notification}
+                        />
+                    ))}
+                </nav>
+            </div>
+            <div className="flex-shrink-0">
+                <button onClick={onLogout} className="flex items-center w-full space-x-4 p-3 rounded-lg transition-colors hover:bg-white/10 text-left">
                     <LogoutIcon />
-                    <span className="font-semibold" style={{color: 'var(--color-text-primary)'}}>Logout</span>
+                    <span className="font-semibold">Logout</span>
                 </button>
             </div>
         </aside>

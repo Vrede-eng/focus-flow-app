@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { User, ChatMessage } from '../../types';
 import Avatar from '../common/Avatar';
@@ -7,9 +6,9 @@ interface ChatViewProps {
     currentUser: User;
     friend: User;
     messages: ChatMessage[];
-    onSendMessage: (to: string, text: string, type: 'text' | 'image', imageDataUrl?: string) => void;
+    onSendMessage: (to_id: string, to_name: string, text: string, type: 'text' | 'image', image_data_url?: string) => void;
     onBack: () => void;
-    onMarkMessagesAsRead: (partnerName: string) => void;
+    onMarkMessagesAsRead: (partnerId: string) => void;
 }
 
 const ChatView: React.FC<ChatViewProps> = ({ currentUser, friend, messages, onSendMessage, onBack, onMarkMessagesAsRead }) => {
@@ -18,8 +17,8 @@ const ChatView: React.FC<ChatViewProps> = ({ currentUser, friend, messages, onSe
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        onMarkMessagesAsRead(friend.name);
-    }, [friend.name, onMarkMessagesAsRead]);
+        onMarkMessagesAsRead(friend.id);
+    }, [friend.id, messages, onMarkMessagesAsRead]);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -28,7 +27,7 @@ const ChatView: React.FC<ChatViewProps> = ({ currentUser, friend, messages, onSe
     
     const handleSend = () => {
         if (text.trim()) {
-            onSendMessage(friend.name, text.trim(), 'text');
+            onSendMessage(friend.id, friend.name, text.trim(), 'text');
             setText('');
         }
     };
@@ -38,7 +37,7 @@ const ChatView: React.FC<ChatViewProps> = ({ currentUser, friend, messages, onSe
         if (file && file.type.startsWith('image/')) {
             const reader = new FileReader();
             reader.onloadend = () => {
-                onSendMessage(friend.name, file.name, 'image', reader.result as string);
+                onSendMessage(friend.id, friend.name, file.name, 'image', reader.result as string);
             }
             reader.readAsDataURL(file);
         } else if (file) {
@@ -67,7 +66,7 @@ const ChatView: React.FC<ChatViewProps> = ({ currentUser, friend, messages, onSe
                     </svg>
                 </button>
                 <div className="flex items-center space-x-3">
-                    <Avatar profilePic={friend.profilePic} equippedFrame={friend.equippedFrame} equippedHat={friend.equippedHat} equippedPet={friend.equippedPet} className="h-10 w-10" />
+                    <Avatar profilePic={friend.profile_pic} equippedFrame={friend.equipped_frame} equippedHat={friend.equipped_hat} equippedPet={friend.equipped_pet} className="h-10 w-10" />
                     <h1 className="text-xl font-bold truncate" style={{ color: 'var(--color-text-primary)' }}>{friend.name}</h1>
                 </div>
             </header>
@@ -77,14 +76,14 @@ const ChatView: React.FC<ChatViewProps> = ({ currentUser, friend, messages, onSe
                     <React.Fragment key={date}>
                         <div className="text-center text-xs my-2 sticky top-2 z-0" style={{ color: 'var(--color-text-secondary)' }}>{date}</div>
                         {msgs.map(msg => (
-                            <div key={msg.id} className={`flex items-end gap-2 ${msg.from === currentUser.name ? 'justify-end' : 'justify-start'}`}>
-                                <div className={`max-w-[80%] px-4 py-2 rounded-2xl ${msg.from === currentUser.name ? 'text-white rounded-br-lg' : 'rounded-bl-lg'}`}
+                            <div key={msg.id} className={`flex items-end gap-2 ${msg.from_id === currentUser.id ? 'justify-end' : 'justify-start'}`}>
+                                <div className={`max-w-[80%] px-4 py-2 rounded-2xl ${msg.from_id === currentUser.id ? 'text-white rounded-br-lg' : 'rounded-bl-lg'}`}
                                      style={{ 
-                                        background: msg.from === currentUser.name ? 'var(--gradient-accent)' : 'var(--color-bg-secondary)',
-                                        color: msg.from === currentUser.name ? 'white' : 'var(--color-text-primary)'
+                                        background: msg.from_id === currentUser.id ? 'var(--gradient-accent)' : 'var(--color-bg-secondary)',
+                                        color: msg.from_id === currentUser.id ? 'white' : 'var(--color-text-primary)'
                                      }}>
-                                    {msg.type === 'image' && msg.imageDataUrl ? (
-                                        <img src={msg.imageDataUrl} alt={msg.text} className="max-w-full h-auto rounded-lg my-1" style={{maxWidth: '200px'}} />
+                                    {msg.type === 'image' && msg.image_data_url ? (
+                                        <img src={msg.image_data_url} alt={msg.text || 'image'} className="max-w-full h-auto rounded-lg my-1" style={{maxWidth: '200px'}} />
                                     ) : (
                                         <p className="whitespace-pre-wrap break-words">{msg.text}</p>
                                     )}

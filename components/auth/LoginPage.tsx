@@ -1,22 +1,22 @@
 import React, { useState } from 'react';
 
 interface LoginPageProps {
-    onLogin: (name: string, password: string) => Promise<string | null>;
+    onLogin: (email: string, password: string) => Promise<string | null>;
     switchToSignup: () => void;
 }
 
 const LoginPage: React.FC<LoginPageProps> = ({ onLogin, switchToSignup }) => {
-    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (name && password && !isLoading) {
+        if (email && password && !isLoading) {
             setIsLoading(true);
             setError(null);
-            const errorMessage = await onLogin(name, password);
+            const errorMessage = await onLogin(email, password);
             setIsLoading(false);
             if (errorMessage) {
                 setError(errorMessage);
@@ -37,10 +37,10 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin, switchToSignup }) => {
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
                         <input
-                            type="text"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            placeholder="Name"
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="Email"
                             className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition"
                             style={{
                                 backgroundColor: 'var(--color-bg-secondary)', 

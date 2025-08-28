@@ -71,7 +71,8 @@ const FriendsPage: React.FC<FriendsPageProps> = (props) => {
     const [showPerksModal, setShowPerksModal] = useState(false);
     const [confirmation, setConfirmation] = useState<{ isOpen: boolean; title: string; message: string; onConfirm: () => void; confirmText: string; confirmButtonClass: string; }>({ isOpen: false, title: '', message: '', onConfirm: () => {}, confirmText: '', confirmButtonClass: '' });
     
-    const userClan = allClans.find(c => c.id === currentUser.clanId);
+    // FIX: Changed clanId to clan_id
+    const userClan = allClans.find(c => c.id === currentUser.clan_id);
     
     const handleCreateClanSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -120,7 +121,8 @@ const FriendsPage: React.FC<FriendsPageProps> = (props) => {
     }
 
     const renderFriendsView = () => {
-        const friendRequests = currentUser.friendRequests || [];
+        // FIX: Changed friendRequests to friend_requests
+        const friendRequests = currentUser.friend_requests || [];
         const friends = currentUser.friends || [];
         const searchResults = searchQuery ? allUsers.filter(u => u.name.toLowerCase().includes(searchQuery.toLowerCase()) && u.name !== currentUser.name && !u.isAdmin && !friends.includes(u.name)) : [];
         const friendRequestsWithDetails = friendRequests.map(req => allUsers.find(u => u.name === req.from)).filter((u): u is User => u !== undefined);
@@ -129,7 +131,8 @@ const FriendsPage: React.FC<FriendsPageProps> = (props) => {
             if (aUnread && !bUnread) return -1; if (!aUnread && bUnread) return 1;
             return a.name.localeCompare(b.name);
         });
-         const getUsernameStyle = (user: User): React.CSSProperties => ({ color: user.usernameColor || 'var(--color-text-primary)', fontFamily: user.equippedFont ? FONTS[user.equippedFont]?.family : 'inherit' });
+         // FIX: Changed usernameColor and equippedFont to snake_case
+         const getUsernameStyle = (user: User): React.CSSProperties => ({ color: user.username_color || 'var(--color-text-primary)', fontFamily: user.equipped_font ? FONTS[user.equipped_font]?.family : 'inherit' });
 
         return (
             <div className="space-y-6">
@@ -139,7 +142,8 @@ const FriendsPage: React.FC<FriendsPageProps> = (props) => {
                     {searchQuery && (
                         <div className="mt-4 space-y-2 max-h-48 overflow-y-auto">
                             {searchResults.length > 0 ? ( searchResults.map(user => {
-                                    const alreadySent = user.friendRequests?.some(req => req.from === currentUser.name) || sentRequests.has(user.name);
+                                    // FIX: Changed friendRequests to friend_requests
+                                    const alreadySent = user.friend_requests?.some(req => req.from === currentUser.name) || sentRequests.has(user.name);
                                     const hasRequestFromUser = friendRequests.some(req => req.from === user.name);
                                     let buttonText = 'Add'; let buttonDisabled = false;
                                     if (alreadySent) { buttonText = 'Sent'; buttonDisabled = true; } 
@@ -147,7 +151,8 @@ const FriendsPage: React.FC<FriendsPageProps> = (props) => {
                                     return (
                                         <div key={user.name} className="flex items-center justify-between p-2 rounded-lg" style={{ backgroundColor: 'var(--color-bg-tertiary)' }}>
                                             <div className="flex items-center space-x-3 truncate">
-                                                <Avatar profilePic={user.profilePic} equippedFrame={user.equippedFrame} equippedHat={user.equippedHat} equippedPet={user.equippedPet} customPetUrl={user.customPetUrl} className="h-10 w-10" />
+                                                {/* FIX: Changed camelCase props to snake_case */}
+                                                <Avatar profilePic={user.profile_pic} equippedFrame={user.equipped_frame} equippedHat={user.equipped_hat} equippedPet={user.equipped_pet} customPetUrl={user.custom_pet_url} className="h-10 w-10" />
                                                 <span className="font-semibold truncate" style={getUsernameStyle(user)}>{user.name}</span>
                                             </div>
                                             <button onClick={() => { onSendRequest(user.name); setSentRequests(prev => new Set(prev).add(user.name)); }} disabled={buttonDisabled} className="text-xs font-bold py-1 px-3 rounded-full hover:opacity-80 transition disabled:opacity-50 disabled:cursor-not-allowed" style={{ background: buttonDisabled ? 'var(--color-bg-tertiary)' : 'var(--gradient-accent)', color: buttonDisabled ? 'var(--color-text-secondary)' : 'white' }}>
@@ -168,7 +173,8 @@ const FriendsPage: React.FC<FriendsPageProps> = (props) => {
                         {friendRequestsWithDetails.map(user => (
                             <div key={user.name} className="flex items-center justify-between p-3 rounded-xl" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
                                 <div className="flex items-center space-x-3 truncate">
-                                    <Avatar profilePic={user.profilePic} equippedFrame={user.equippedFrame} equippedHat={user.equippedHat} equippedPet={user.equippedPet} customPetUrl={user.customPetUrl} className="h-10 w-10" />
+                                    {/* FIX: Changed camelCase props to snake_case */}
+                                    <Avatar profilePic={user.profile_pic} equippedFrame={user.equipped_frame} equippedHat={user.equipped_hat} equippedPet={user.equipped_pet} customPetUrl={user.custom_pet_url} className="h-10 w-10" />
                                     <span className="font-semibold truncate" style={getUsernameStyle(user)}>{user.name}</span>
                                 </div>
                                 <div className="flex space-x-2">
@@ -189,7 +195,8 @@ const FriendsPage: React.FC<FriendsPageProps> = (props) => {
                             <div key={friend.name} className="w-full flex items-center justify-between p-3 rounded-xl" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
                                 <button onClick={() => onViewProfile(friend.name)} className="flex items-center space-x-3 truncate hover:opacity-80 transition-opacity text-left">
                                     <div className="relative">
-                                        <Avatar profilePic={friend.profilePic} equippedFrame={friend.equippedFrame} equippedHat={friend.equippedHat} equippedPet={friend.equippedPet} customPetUrl={friend.customPetUrl} className="h-10 w-10" />
+                                        {/* FIX: Changed camelCase props to snake_case */}
+                                        <Avatar profilePic={friend.profile_pic} equippedFrame={friend.equipped_frame} equippedHat={friend.equipped_hat} equippedPet={friend.equipped_pet} customPetUrl={friend.custom_pet_url} className="h-10 w-10" />
                                         {unreadSenders.has(friend.name) && (
                                             <span className="absolute top-0 right-0 h-2.5 w-2.5 bg-red-500 rounded-full border-2" style={{borderColor: 'var(--color-bg-secondary)'}}></span>
                                         )}
@@ -229,7 +236,8 @@ const FriendsPage: React.FC<FriendsPageProps> = (props) => {
                                 <ClanBanner banner={userClan.banner} className="h-16 w-16 rounded-lg flex-shrink-0" />
                                 <div>
                                     <h2 className="text-2xl font-bold">{userClan.name}</h2>
-                                    <p className="text-sm" style={{color: 'var(--color-text-secondary)'}}>Level {userClan.level} | Members: {userClan.members.length} / {userClan.maxMembers}</p>
+                                    {/* FIX: Changed maxMembers to max_members */}
+                                    <p className="text-sm" style={{color: 'var(--color-text-secondary)'}}>Level {userClan.level} | Members: {userClan.members.length} / {userClan.max_members}</p>
                                 </div>
                              </div>
                             {isLeader && <button onClick={() => setShowSettingsModal(true)} className="p-2 rounded-full hover:opacity-80"><SettingsIcon/></button>}
@@ -248,7 +256,8 @@ const FriendsPage: React.FC<FriendsPageProps> = (props) => {
                                 Clan Chat
                                 {unreadClanMessages && <span className="absolute top-1 right-2 h-2 w-2 bg-white rounded-full"></span>}
                             </button>
-                            <button onClick={() => setShowInviteModal(true)} disabled={userClan.members.length >= userClan.maxMembers} className="w-full font-bold py-2 px-4 rounded-xl hover:opacity-80 disabled:opacity-50" style={{backgroundColor: 'var(--color-bg-tertiary)'}}>Invite</button>
+                            {/* FIX: Changed maxMembers to max_members */}
+                            <button onClick={() => setShowInviteModal(true)} disabled={userClan.members.length >= userClan.max_members} className="w-full font-bold py-2 px-4 rounded-xl hover:opacity-80 disabled:opacity-50" style={{backgroundColor: 'var(--color-bg-tertiary)'}}>Invite</button>
                             <button onClick={handleLeaveClanConfirm} className="w-full text-red-400 font-bold py-2 px-4 rounded-xl hover:opacity-80" style={{backgroundColor: 'var(--color-bg-tertiary)'}}>Leave Clan</button>
                          </div>
                      </div>
@@ -257,7 +266,8 @@ const FriendsPage: React.FC<FriendsPageProps> = (props) => {
                          {clanMembers.sort((a,b) => (b.name === userClan.leader ? 1 : 0) - (a.name === userClan.leader ? 1 : 0)).map(member => (
                              <div key={member.name} className="flex items-center justify-between p-3 rounded-xl" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
                                  <button onClick={() => onViewProfile(member.name)} className="flex items-center space-x-3 truncate hover:opacity-80">
-                                     <Avatar profilePic={member.profilePic} equippedFrame={member.equippedFrame} equippedHat={member.equippedHat} equippedPet={member.equippedPet} customPetUrl={member.customPetUrl} className="h-10 w-10"/>
+                                     {/* FIX: Changed camelCase props to snake_case */}
+                                     <Avatar profilePic={member.profile_pic} equippedFrame={member.equipped_frame} equippedHat={member.equipped_hat} equippedPet={member.equipped_pet} customPetUrl={member.custom_pet_url} className="h-10 w-10"/>
                                      <div>
                                          <p className="font-semibold truncate">{member.name}</p>
                                          <p className="text-xs text-left" style={{color: 'var(--color-text-secondary)'}}>{userClan.leader === member.name ? 'Leader' : 'Member'}</p>
@@ -286,10 +296,13 @@ const FriendsPage: React.FC<FriendsPageProps> = (props) => {
                         </button>
                      </form>
                 </div>
-                {(currentUser.clanInvites?.length || 0) > 0 && (
+                {/* FIX: Changed clanInvites to clan_invites */}
+                {(currentUser.clan_invites?.length || 0) > 0 && (
                     <div className="space-y-3">
-                        <h2 className="font-bold text-lg">Clan Invites ({currentUser.clanInvites?.length})</h2>
-                        {currentUser.clanInvites?.map(invite => (
+                        {/* FIX: Changed clanInvites to clan_invites */}
+                        <h2 className="font-bold text-lg">Clan Invites ({currentUser.clan_invites?.length})</h2>
+                        {/* FIX: Changed clanInvites to clan_invites */}
+                        {currentUser.clan_invites?.map(invite => (
                              <div key={invite.clanId} className="flex items-center justify-between p-3 rounded-xl" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
                                  <div>
                                      <p className="font-semibold">{invite.clanName}</p>
@@ -309,7 +322,8 @@ const FriendsPage: React.FC<FriendsPageProps> = (props) => {
 
     const InviteModal = () => {
         if (!showInviteModal || !userClan) return null;
-        const friendsToInvite = allUsers.filter(u => currentUser.friends.includes(u.name) && !u.clanId && !u.clanInvites?.some(inv => inv.clanId === userClan.id));
+        // FIX: Changed clanId and clanInvites to snake_case
+        const friendsToInvite = allUsers.filter(u => currentUser.friends.includes(u.name) && !u.clan_id && !u.clan_invites?.some(inv => inv.clanId === userClan.id));
         return (
             <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
                 <div className="p-6 rounded-2xl w-full max-w-sm" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
@@ -405,8 +419,10 @@ const FriendsPage: React.FC<FriendsPageProps> = (props) => {
             </header>
 
             <div className="grid grid-cols-2 gap-2 p-1 rounded-xl" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
-                <FilterButton label="Friends" value="friends" currentValue={activeView} setter={setActiveView} hasNotification={!!currentUser.friendRequests?.length} />
-                <FilterButton label="Clan" value="clan" currentValue={activeView} setter={setActiveView} hasNotification={!!currentUser.clanInvites?.length || unreadClanMessages} />
+                {/* FIX: Changed friendRequests to friend_requests */}
+                <FilterButton label="Friends" value="friends" currentValue={activeView} setter={setActiveView} hasNotification={!!currentUser.friend_requests?.length} />
+                {/* FIX: Changed clanInvites to clan_invites */}
+                <FilterButton label="Clan" value="clan" currentValue={activeView} setter={setActiveView} hasNotification={!!currentUser.clan_invites?.length || unreadClanMessages} />
             </div>
 
             {activeView === 'friends' ? renderFriendsView() : renderClanView()}

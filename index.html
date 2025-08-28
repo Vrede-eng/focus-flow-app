@@ -4,12 +4,13 @@
     "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/",
     "react/": "https://aistudiocdn.com/react@^19.1.1/",
     "react": "https://aistudiocdn.com/react@^19.1.1",
-    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.16.0"
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.16.0",
+    "@supabase/supabase-js": "https://aistudiocdn.com/@supabase/supabase-js@^2.45.0"
   }
 }
 </script>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -50,5 +51,14 @@
       }
 
       @keyframes gold-shine {
-          0% { text-shadow: 0 0 3px rgba(252, 246, 186, 0.5), 0 0 5px rgba(255, 215, 0, 0.5); }
-          50% { text-shadow: 
+          0% { text-shadow: 0 0 3px rgba(252, 236, 186, 0.5); }
+          50% { text-shadow: 0 0 10px rgba(251, 245, 183, 0.8); }
+          100% { text-shadow: 0 0 3px rgba(252, 236, 186, 0.5); }
+      }
+    </style>
+  </head>
+  <body class="h-full">
+    <div id="root" class="h-full"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>

@@ -70,7 +70,8 @@ const HomePage: React.FC<HomePageProps> = ({ user, onLogHours, onLogout, onViewP
     });
     
     const today = getLocalDateString(user.timezone);
-    const hoursLoggedToday = user.studyLog
+    // FIX: Changed studyLog to study_log to match User type
+    const hoursLoggedToday = user.study_log
         .filter(log => log.date === today)
         .reduce((sum, log) => sum + log.hours, 0);
     const remainingHours = Math.max(0, 10 - hoursLoggedToday);
@@ -97,19 +98,23 @@ const HomePage: React.FC<HomePageProps> = ({ user, onLogHours, onLogout, onViewP
     const prestigeCap = prestigeInfo.cap;
     const prestigeProgressPercentage = prestigeCap === Infinity ? 100 : (user.level / prestigeCap) * 100;
 
-    const isGold = user.usernameColor === '#FFD700';
+    // FIX: Changed usernameColor to username_color to match User type
+    const isGold = user.username_color === '#FFD700';
     const usernameStyle: React.CSSProperties = {
-        fontFamily: user.equippedFont ? FONTS[user.equippedFont]?.family : 'inherit',
+        // FIX: Changed equippedFont to equipped_font to match User type
+        fontFamily: user.equipped_font ? FONTS[user.equipped_font]?.family : 'inherit',
     };
     if (!isGold) {
-        usernameStyle.color = user.usernameColor || 'var(--color-text-primary)';
+        // FIX: Changed usernameColor to username_color to match User type
+        usernameStyle.color = user.username_color || 'var(--color-text-primary)';
     }
     
     return (
         <div className="p-6 space-y-8">
             <header className="flex justify-between items-start">
                 <button onClick={onViewProfile} className="flex items-center space-x-3 text-left">
-                    <Avatar profilePic={user.profilePic} equippedFrame={user.equippedFrame} equippedHat={user.equippedHat} equippedPet={user.equippedPet} customPetUrl={user.customPetUrl} className="h-12 w-12" />
+                    {/* FIX: Changed camelCase props to snake_case to match User type */}
+                    <Avatar profilePic={user.profile_pic} equippedFrame={user.equipped_frame} equippedHat={user.equipped_hat} equippedPet={user.equipped_pet} customPetUrl={user.custom_pet_url} className="h-12 w-12" />
                     <div>
                         <h1 className={`text-2xl font-bold truncate ${isGold ? 'gold-username' : ''}`} style={usernameStyle}>{user.name}</h1>
                     </div>

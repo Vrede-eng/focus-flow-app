@@ -1,6 +1,7 @@
 import { Achievement, User } from '../types';
 
-const getTotalHours = (user: User) => user.studyLog.reduce((sum, log) => sum + log.hours, 0);
+// FIX: Changed studyLog to study_log
+const getTotalHours = (user: User) => user.study_log.reduce((sum, log) => sum + log.hours, 0);
 
 export const ACHIEVEMENTS_LIST: Achievement[] = [
   // TIER 1: EASY
@@ -37,7 +38,8 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     name: 'Goal-Setter',
     description: 'Complete your first weekly goal.',
     reward: { title: 'Achiever' },
-    check: (user) => (user.totalGoalsCompleted || 0) >= 1,
+    // FIX: Changed totalGoalsCompleted to total_goals_completed
+    check: (user) => (user.total_goals_completed || 0) >= 1,
   },
   
   // TIER 2: CONSISTENCY & EARLY PROGRESS
@@ -67,7 +69,8 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     name: 'Taskmaster',
     description: 'Complete 5 weekly goals.',
     reward: { title: 'Taskmaster' },
-    check: (user) => (user.totalGoalsCompleted || 0) >= 5,
+    // FIX: Changed totalGoalsCompleted to total_goals_completed
+    check: (user) => (user.total_goals_completed || 0) >= 5,
   },
   {
     id: 'add_5_friends',
@@ -104,14 +107,16 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     name: 'Marathoner',
     description: 'Log 8 hours in a single day.',
     reward: { title: 'Marathoner' },
-    check: (user) => user.studyLog.some(log => log.hours >= 8), // This checks any single log entry, better to check sum for a day.
+    // FIX: Changed studyLog to study_log
+    check: (user) => user.study_log.some(log => log.hours >= 8), // This checks any single log entry, better to check sum for a day.
   },
   {
     id: 'complete_15_goals',
     name: 'Go-Getter',
     description: 'Complete 15 weekly goals.',
     reward: { title: 'Go-Getter' },
-    check: (user) => (user.totalGoalsCompleted || 0) >= 15,
+    // FIX: Changed totalGoalsCompleted to total_goals_completed
+    check: (user) => (user.total_goals_completed || 0) >= 15,
   },
 
   // TIER 4: ADEPT
@@ -148,7 +153,8 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     name: 'Overachiever',
     description: 'Complete 30 weekly goals.',
     reward: { title: 'Overachiever' },
-    check: (user) => (user.totalGoalsCompleted || 0) >= 30,
+    // FIX: Changed totalGoalsCompleted to total_goals_completed
+    check: (user) => (user.total_goals_completed || 0) >= 30,
   },
 
   // TIER 5: MASTER
@@ -187,7 +193,8 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     reward: { title: 'Full-Timer' },
     check: (user) => {
         const dailyTotals: {[key: string]: number} = {};
-        user.studyLog.forEach(log => {
+        // FIX: Changed studyLog to study_log
+        user.study_log.forEach(log => {
             dailyTotals[log.date] = (dailyTotals[log.date] || 0) + log.hours;
         });
         return Object.values(dailyTotals).some(total => total >= 10);
@@ -221,7 +228,8 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     name: 'Dominator',
     description: 'Complete 50 weekly goals.',
     reward: { title: 'Dominator' },
-    check: (user) => (user.totalGoalsCompleted || 0) >= 50,
+    // FIX: Changed totalGoalsCompleted to total_goals_completed
+    check: (user) => (user.total_goals_completed || 0) >= 50,
   },
   {
     id: 'log_1000_hours',

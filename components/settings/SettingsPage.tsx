@@ -92,7 +92,8 @@ const SettingsPage: React.FC<SettingsPageProps> = (props) => {
     const [showAgreement, setShowAgreement] = useState(false);
 
     const [profileBgColor, setProfileBgColor] = useState(
-        currentUser.profileTheme?.bg?.startsWith('#') ? currentUser.profileTheme.bg : '#1e293b'
+        // FIX: Changed profileTheme to profile_theme
+        currentUser.profile_theme?.bg?.startsWith('#') ? currentUser.profile_theme.bg : '#1e293b'
     );
     
     const unlocked = useMemo(() => new Set(currentUser.unlocks || []), [currentUser.unlocks]);
@@ -141,7 +142,8 @@ const SettingsPage: React.FC<SettingsPageProps> = (props) => {
 
             <main className="p-6 space-y-8">
                 <button onClick={onViewProfile} className="flex flex-col items-center space-y-4 text-center hover:opacity-80 transition-opacity w-full">
-                    <Avatar profilePic={currentUser.profilePic} equippedFrame={currentUser.equippedFrame} equippedHat={currentUser.equippedHat} equippedPet={currentUser.equippedPet} customPetUrl={currentUser.customPetUrl} className="h-32 w-32" />
+                    {/* FIX: Changed camelCase props to snake_case */}
+                    <Avatar profilePic={currentUser.profile_pic} equippedFrame={currentUser.equipped_frame} equippedHat={currentUser.equipped_hat} equippedPet={currentUser.equipped_pet} customPetUrl={currentUser.custom_pet_url} className="h-32 w-32" />
                     <h2 className="text-2xl font-bold">{currentUser.name}</h2>
                 </button>
                 
@@ -177,9 +179,12 @@ const SettingsPage: React.FC<SettingsPageProps> = (props) => {
                      <div>
                         <label className="text-sm font-medium mb-2 block" style={{ color: 'var(--color-text-secondary)' }}>Profile Privacy</label>
                         <div className="flex items-center justify-between p-3 rounded-lg" style={{backgroundColor: 'var(--color-bg-tertiary)'}}>
-                            <span>Make profile private? <span className="text-xs">({currentUser.isPrivate ? "Enabled" : "Disabled"})</span></span>
-                            <button onClick={() => onUpdatePrivacy(!currentUser.isPrivate)} className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors ${currentUser.isPrivate ? 'bg-green-500' : 'bg-gray-600'}`}>
-                                <span className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform ${currentUser.isPrivate ? 'translate-x-6' : 'translate-x-1'}`}/>
+                            {/* FIX: Changed isPrivate to is_private */}
+                            <span>Make profile private? <span className="text-xs">({currentUser.is_private ? "Enabled" : "Disabled"})</span></span>
+                            {/* FIX: Changed isPrivate to is_private */}
+                            <button onClick={() => onUpdatePrivacy(!currentUser.is_private)} className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors ${currentUser.is_private ? 'bg-green-500' : 'bg-gray-600'}`}>
+                                {/* FIX: Changed isPrivate to is_private */}
+                                <span className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform ${currentUser.is_private ? 'translate-x-6' : 'translate-x-1'}`}/>
                             </button>
                         </div>
                     </div>
@@ -197,7 +202,8 @@ const SettingsPage: React.FC<SettingsPageProps> = (props) => {
                     {/* Title */}
                     <div>
                         <label className="text-sm font-medium mb-2 block" style={{ color: 'var(--color-text-secondary)' }}>Title</label>
-                        <select value={currentUser.equippedTitle || ''} onChange={(e) => onEquipTitle(e.target.value || null)} className="w-full px-4 py-2 rounded-lg" style={{ backgroundColor: 'var(--color-bg-tertiary)', color: 'var(--color-text-primary)', appearance: 'none' }}>
+                        {/* FIX: Changed equippedTitle to equipped_title */}
+                        <select value={currentUser.equipped_title || ''} onChange={(e) => onEquipTitle(e.target.value || null)} className="w-full px-4 py-2 rounded-lg" style={{ backgroundColor: 'var(--color-bg-tertiary)', color: 'var(--color-text-primary)', appearance: 'none' }}>
                             <option value="">{determineTitle(currentUser.level, currentUser.prestige)} (Default)</option>
                             {unlockedTitles.map(title => <option key={title} value={title}>{title}</option>)}
                         </select>
@@ -222,17 +228,21 @@ const SettingsPage: React.FC<SettingsPageProps> = (props) => {
                     <div>
                          <label className="text-sm font-medium mb-2 block" style={{ color: 'var(--color-text-secondary)' }}>Avatar</label>
                         <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
-                            {PREDEFINED_AVATARS.map(avatarId => <CustomizationItem key={avatarId} onClick={() => onUpdateProfilePic(avatarId)} isUnlocked={unlocked.has(avatarId)} isEquipped={currentUser.profilePic === avatarId}><Avatar profilePic={avatarId} className="w-full h-full p-1" /></CustomizationItem>)}
+                            {/* FIX: Changed profilePic to profile_pic */}
+                            {PREDEFINED_AVATARS.map(avatarId => <CustomizationItem key={avatarId} onClick={() => onUpdateProfilePic(avatarId)} isUnlocked={unlocked.has(avatarId)} isEquipped={currentUser.profile_pic === avatarId}><Avatar profilePic={avatarId} className="w-full h-full p-1" /></CustomizationItem>)}
                              <input type="file" ref={fileInputRefs.avatar} onChange={(e) => handleFileChange(e, 'avatar')} accept="image/*" className="hidden" />
-                             <CustomizationItem onClick={() => fileInputRefs.avatar.current?.click()} isUnlocked={hasCustomAvatar} isEquipped={currentUser.profilePic.startsWith('data:image')}><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg></CustomizationItem>
+                             {/* FIX: Changed profilePic to profile_pic */}
+                             <CustomizationItem onClick={() => fileInputRefs.avatar.current?.click()} isUnlocked={hasCustomAvatar} isEquipped={currentUser.profile_pic.startsWith('data:image')}><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg></CustomizationItem>
                         </div>
                     </div>
                      {/* Frame */}
                     <div>
                          <label className="text-sm font-medium mb-2 block" style={{ color: 'var(--color-text-secondary)' }}>Avatar Frame</label>
                         <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
-                            <CustomizationItem onClick={() => onEquipFrame(null)} isUnlocked={true} isEquipped={!currentUser.equippedFrame}>None</CustomizationItem>
-                            {Object.values(FRAMES).map(frame => <CustomizationItem key={frame.id} name={frame.name} onClick={() => onEquipFrame(frame.id)} isUnlocked={unlocked.has(frame.id)} isEquipped={currentUser.equippedFrame === frame.id}><div className="w-full h-full p-1" dangerouslySetInnerHTML={{ __html: frame.svg }}/></CustomizationItem>)}
+                            {/* FIX: Changed equippedFrame to equipped_frame */}
+                            <CustomizationItem onClick={() => onEquipFrame(null)} isUnlocked={true} isEquipped={!currentUser.equipped_frame}>None</CustomizationItem>
+                            {/* FIX: Changed equippedFrame to equipped_frame */}
+                            {Object.values(FRAMES).map(frame => <CustomizationItem key={frame.id} name={frame.name} onClick={() => onEquipFrame(frame.id)} isUnlocked={unlocked.has(frame.id)} isEquipped={currentUser.equipped_frame === frame.id}><div className="w-full h-full p-1" dangerouslySetInnerHTML={{ __html: frame.svg }}/></CustomizationItem>)}
                         </div>
                     </div>
                     {/* Hat */}
@@ -241,7 +251,8 @@ const SettingsPage: React.FC<SettingsPageProps> = (props) => {
                          <div className="p-3 rounded-lg flex items-center space-x-2" style={{backgroundColor: 'var(--color-bg-tertiary)'}}>
                             <input type="file" ref={fileInputRefs.hat} onChange={(e) => handleFileChange(e, 'hat')} accept="image/*" className="hidden" />
                             <button onClick={() => fileInputRefs.hat.current?.click()} className="text-sm font-semibold py-2 px-3 rounded-lg w-full" style={{backgroundColor: 'var(--color-bg-secondary)'}}>Upload Custom Hat</button>
-                            {currentUser.equippedHat && <button onClick={() => onUpdateHat(null)} className="text-sm font-semibold py-2 px-3 rounded-lg" style={{backgroundColor: 'var(--color-bg-secondary)'}}>Remove Hat</button>}
+                            {/* FIX: Changed equippedHat to equipped_hat */}
+                            {currentUser.equipped_hat && <button onClick={() => onUpdateHat(null)} className="text-sm font-semibold py-2 px-3 rounded-lg" style={{backgroundColor: 'var(--color-bg-secondary)'}}>Remove Hat</button>}
                         </div>
                         {!hasCustomHat && <LockedOverlay featureName="Custom Hat" />}
                     </div>
@@ -249,10 +260,13 @@ const SettingsPage: React.FC<SettingsPageProps> = (props) => {
                     <div>
                          <label className="text-sm font-medium mb-2 block" style={{ color: 'var(--color-text-secondary)' }}>Pet</label>
                         <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
-                             <CustomizationItem onClick={() => onEquipPet(null)} isUnlocked={true} isEquipped={!currentUser.equippedPet}>None</CustomizationItem>
-                            {Object.values(PETS).map(pet => <CustomizationItem key={pet.id} name={pet.name} onClick={() => onEquipPet(pet.id)} isUnlocked={unlocked.has(pet.id)} isEquipped={currentUser.equippedPet === pet.id}><div className="w-full h-full p-1" dangerouslySetInnerHTML={{ __html: pet.svg }}/></CustomizationItem>)}
+                             {/* FIX: Changed equippedPet to equipped_pet */}
+                             <CustomizationItem onClick={() => onEquipPet(null)} isUnlocked={true} isEquipped={!currentUser.equipped_pet}>None</CustomizationItem>
+                            {/* FIX: Changed equippedPet to equipped_pet */}
+                            {Object.values(PETS).map(pet => <CustomizationItem key={pet.id} name={pet.name} onClick={() => onEquipPet(pet.id)} isUnlocked={unlocked.has(pet.id)} isEquipped={currentUser.equipped_pet === pet.id}><div className="w-full h-full p-1" dangerouslySetInnerHTML={{ __html: pet.svg }}/></CustomizationItem>)}
                             <input type="file" ref={fileInputRefs.customPet} onChange={(e) => handleFileChange(e, 'custom_pet')} accept="image/*" className="hidden" />
-                             <CustomizationItem onClick={() => fileInputRefs.customPet.current?.click()} isUnlocked={hasCustomPet} isEquipped={currentUser.equippedPet === 'custom'}><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg></CustomizationItem>
+                             {/* FIX: Changed equippedPet to equipped_pet */}
+                             <CustomizationItem onClick={() => fileInputRefs.customPet.current?.click()} isUnlocked={hasCustomPet} isEquipped={currentUser.equipped_pet === 'custom'}><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg></CustomizationItem>
                         </div>
                     </div>
                 </div>
@@ -274,23 +288,28 @@ const SettingsPage: React.FC<SettingsPageProps> = (props) => {
                          <div>
                             <label className="text-xs font-medium mb-2 block" style={{ color: 'var(--color-text-secondary)' }}>Font</label>
                             <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
-                                <CustomizationItem onClick={() => onEquipFont(null)} isUnlocked={true} isEquipped={!currentUser.equippedFont} name="Default" className="text-sm">Aa</CustomizationItem>
-                                {Object.values(FONTS).map(font => <CustomizationItem key={font.id} name={font.name} onClick={() => onEquipFont(font.id)} isUnlocked={unlocked.has(font.id)} isEquipped={currentUser.equippedFont === font.id} className="text-sm" style={{fontFamily: font.family}}>Aa</CustomizationItem>)}
+                                {/* FIX: Changed equippedFont to equipped_font */}
+                                <CustomizationItem onClick={() => onEquipFont(null)} isUnlocked={true} isEquipped={!currentUser.equipped_font} name="Default" className="text-sm">Aa</CustomizationItem>
+                                {/* FIX: Changed equippedFont to equipped_font */}
+                                {Object.values(FONTS).map(font => <CustomizationItem key={font.id} name={font.name} onClick={() => onEquipFont(font.id)} isUnlocked={unlocked.has(font.id)} isEquipped={currentUser.equipped_font === font.id} className="text-sm" style={{fontFamily: font.family}}>Aa</CustomizationItem>)}
                             </div>
                         </div>
                          {/* Color */}
                          <div>
                             <label className="text-xs font-medium mb-2 block" style={{ color: 'var(--color-text-secondary)' }}>Color</label>
                             <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
-                                <CustomizationItem onClick={() => onUpdateUsernameColor(null)} isUnlocked={true} isEquipped={!currentUser.usernameColor} name="Default"><></></CustomizationItem>
-                                {unlockedColors.map(color => <CustomizationItem key={color.id} name={color.name} onClick={() => onUpdateUsernameColor(color.color)} isUnlocked={true} isEquipped={currentUser.usernameColor === color.color} style={{backgroundColor: color.color}}><></></CustomizationItem>)}
+                                {/* FIX: Changed usernameColor to username_color */}
+                                <CustomizationItem onClick={() => onUpdateUsernameColor(null)} isUnlocked={true} isEquipped={!currentUser.username_color} name="Default"><></></CustomizationItem>
+                                {/* FIX: Changed usernameColor to username_color */}
+                                {unlockedColors.map(color => <CustomizationItem key={color.id} name={color.name} onClick={() => onUpdateUsernameColor(color.color)} isUnlocked={true} isEquipped={currentUser.username_color === color.color} style={{backgroundColor: color.color}}><></></CustomizationItem>)}
                             </div>
                             <div className="relative mt-2">
                                 <button
                                     onClick={() => onUpdateUsernameColor(USERNAME_COLORS['gold'].color)}
                                     disabled={!unlocked.has('username-color-gold')}
                                     className="w-full py-2 rounded-lg font-bold transition text-base relative overflow-hidden disabled:cursor-not-allowed"
-                                    style={{ background: 'linear-gradient(to right, #BF953F, #FCF6BA, #B38728)', color: '#422c07', textShadow: '0 1px 1px rgba(255, 255, 255, 0.3)', border: currentUser.usernameColor === USERNAME_COLORS['gold'].color ? '2px solid white' : '2px solid #AA771C' }}
+                                    // FIX: Changed usernameColor to username_color
+                                    style={{ background: 'linear-gradient(to right, #BF953F, #FCF6BA, #B38728)', color: '#422c07', textShadow: '0 1px 1px rgba(255, 255, 255, 0.3)', border: currentUser.username_color === USERNAME_COLORS['gold'].color ? '2px solid white' : '2px solid #AA771C' }}
                                 >
                                     Equip Gold Username
                                 </button>
