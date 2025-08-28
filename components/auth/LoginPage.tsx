@@ -1,12 +1,14 @@
 
+
 import React, { useState } from 'react';
 
 interface LoginPageProps {
     onLogin: (name: string, password: string) => Promise<string | null>;
     switchToSignup: () => void;
+    isOnline: boolean;
 }
 
-const LoginPage: React.FC<LoginPageProps> = ({ onLogin, switchToSignup }) => {
+const LoginPage: React.FC<LoginPageProps> = ({ onLogin, switchToSignup, isOnline }) => {
     const [name, setName] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
@@ -15,6 +17,11 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin, switchToSignup }) => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (name && password && !isLoading) {
+            if (!isOnline && name.toLowerCase() !== 'admin') {
+                setError("Sign in is currently unavailable. The app is in offline mode.");
+                return;
+            }
+
             setIsLoading(true);
             setError(null);
             const errorMessage = await onLogin(name, password);

@@ -45,6 +45,7 @@ export const createAdminUser = (): User => {
     const adminUser: User = {
         id: 'admin-user-id',
         name: 'ADMIN',
+        password: 'admin', // Add default password
         profile_pic: 'avatar-20', // A distinct avatar
         level: 99,
         xp: 999999,

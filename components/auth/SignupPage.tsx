@@ -1,13 +1,15 @@
 
+
 import React, { useState, useMemo } from 'react';
 import AgreementModal from '../common/AgreementModal';
 
 interface SignupPageProps {
     onSignup: (name: string, password: string) => Promise<string | null>;
     switchToLogin: () => void;
+    isOnline: boolean;
 }
 
-const SignupPage: React.FC<SignupPageProps> = ({ onSignup, switchToLogin }) => {
+const SignupPage: React.FC<SignupPageProps> = ({ onSignup, switchToLogin, isOnline }) => {
     const [name, setName] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -33,7 +35,7 @@ const SignupPage: React.FC<SignupPageProps> = ({ onSignup, switchToLogin }) => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
-        if (isLoading) return;
+        if (isLoading || !isOnline) return;
 
         if (nameError) {
              setError(nameError);
@@ -78,6 +80,12 @@ const SignupPage: React.FC<SignupPageProps> = ({ onSignup, switchToLogin }) => {
                 <p className="mt-2" style={{ color: 'var(--color-text-secondary)' }}>Start your learning journey with us.</p>
             </div>
             <div className="w-full max-w-sm">
+                {!isOnline && (
+                    <div className="text-center p-3 rounded-lg mb-6 bg-yellow-500/10 text-yellow-300">
+                        <p className="font-bold">Site Currently Down</p>
+                        <p className="text-sm">Account creation is temporarily unavailable.</p>
+                    </div>
+                )}
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
                          <input
@@ -92,7 +100,7 @@ const SignupPage: React.FC<SignupPageProps> = ({ onSignup, switchToLogin }) => {
                                 borderColor: hasError ? '#f43f5e' : 'var(--color-bg-tertiary)',
                             }}
                             required
-                            disabled={isLoading}
+                            disabled={isLoading || !isOnline}
                             aria-invalid={!!nameError}
                             aria-describedby="name-error"
                         />
@@ -111,7 +119,7 @@ const SignupPage: React.FC<SignupPageProps> = ({ onSignup, switchToLogin }) => {
                                 borderColor: hasError ? '#f43f5e' : 'var(--color-bg-tertiary)',
                             }}
                             required
-                            disabled={isLoading}
+                            disabled={isLoading || !isOnline}
                         />
                     </div>
                      <div>
@@ -127,7 +135,7 @@ const SignupPage: React.FC<SignupPageProps> = ({ onSignup, switchToLogin }) => {
                                 borderColor: hasError ? '#f43f5e' : 'var(--color-bg-tertiary)',
                             }}
                             required
-                            disabled={isLoading}
+                            disabled={isLoading || !isOnline}
                         />
                     </div>
                     {error && !nameError && (
@@ -139,7 +147,7 @@ const SignupPage: React.FC<SignupPageProps> = ({ onSignup, switchToLogin }) => {
                         type="submit"
                         style={{ background: 'var(--gradient-accent)' }}
                         className="w-full text-white font-bold py-3 px-4 rounded-xl hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled={isLoading}
+                        disabled={isLoading || !isOnline}
                     >
                         {isLoading ? 'Creating Account...' : 'Sign Up'}
                     </button>
