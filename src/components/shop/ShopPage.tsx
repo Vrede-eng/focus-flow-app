@@ -1,5 +1,4 @@
 
-
 import React, { useState, useMemo } from 'react';
 import { User } from '../../types';
 import { SHOP_ITEMS, ShopItem } from '../../lib/shop';
@@ -63,13 +62,12 @@ const ShopPage: React.FC<ShopPageProps> = ({ currentUser, onPurchase, onUse }) =
 
     const myConsumables = useMemo(() => {
         const items = [];
-        if ((currentUser.inventory?.streakShield || 0) > 0) {
+        if (currentUser.inventory?.streakShield && currentUser.inventory.streakShield > 0) {
             items.push(SHOP_ITEMS.find(i => i.id === 'consumable-streak-shield'));
         }
         if (currentUser.inventory?.xpPotions) {
-            Object.entries(currentUser.inventory.xpPotions).forEach(([potionId, count]) => {
-                // FIX: Explicitly cast `count` to a number to prevent type errors.
-                if(Number(count) > 0) {
+            Object.keys(currentUser.inventory.xpPotions).forEach(potionId => {
+                if(currentUser.inventory?.xpPotions?.[potionId] && currentUser.inventory.xpPotions[potionId] > 0) {
                     const potionInfo = SHOP_ITEMS.find(i => i.id === potionId);
                     if (potionInfo) items.push(potionInfo);
                 }
@@ -129,46 +127,45 @@ const ShopPage: React.FC<ShopPageProps> = ({ currentUser, onPurchase, onUse }) =
     );
 
     const renderMyItems = () => {
+        const xpPotions = SHOP_ITEMS.find(i => i.id === 'consumable-xp-potion-100');
+        const xpPotionCount = currentUser.inventory?.xpPotions?.['consumable-xp-potion-100'] || 0;
+        
         return (
          <div className="space-y-4">
             <h2 className="text-xl font-bold" style={{ color: 'var(--color-text-primary)' }}>My Items</h2>
              {myConsumables.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {myConsumables.map(item => {
-                        let quantity = 0;
-                        let isUsable = false;
-                        
-                        if (item.id === 'consumable-streak-shield') {
-                            quantity = currentUser.inventory?.streakShield || 0;
-                        } else if (item.id.startsWith('consumable-xp-potion')) {
-                            quantity = currentUser.inventory?.xpPotions?.[item.id] || 0;
-                            isUsable = true;
-                        }
-
-                        if (quantity === 0) return null;
-
-                        return (
-                            <div key={item.id} className="p-4 rounded-xl flex flex-col justify-between" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
+                    {currentUser.inventory?.streakShield && currentUser.inventory.streakShield > 0 && (() => {
+                        const streakShieldInfo = SHOP_ITEMS.find(i => i.id === 'consumable-streak-shield');
+                        return streakShieldInfo ? (
+                            <div key={streakShieldInfo.id} className="p-4 rounded-xl flex flex-col justify-between" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
                                 <div>
-                                    <h3 className="font-bold">{item.name} <span className="text-xs" style={{color: 'var(--color-text-secondary)'}}>x{quantity}</span></h3>
-                                    <p className="text-sm mt-1" style={{ color: 'var(--color-text-secondary)' }}>{item.description}</p>
+                                    <h3 className="font-bold">{streakShieldInfo.name} <span className="text-xs" style={{color: 'var(--color-text-secondary)'}}>x1</span></h3>
+                                    <p className="text-sm mt-1" style={{ color: 'var(--color-text-secondary)' }}>{streakShieldInfo.description}</p>
                                 </div>
                                 <div className="flex justify-end items-center mt-4">
-                                    {isUsable ? (
-                                        <button 
-                                            onClick={() => onUse(item.id)}
-                                            className="font-bold text-sm py-2 px-4 rounded-lg text-white transition"
-                                            style={{ background: 'var(--gradient-accent)' }}
-                                        >
-                                            Use
-                                        </button>
-                                    ) : (
-                                        <p className="text-sm font-semibold italic" style={{color: 'var(--color-accent-primary)'}}>Passive Effect</p>
-                                    )}
+                                    <p className="text-sm font-semibold italic" style={{color: 'var(--color-accent-primary)'}}>Passive Effect</p>
                                 </div>
                             </div>
-                        );
-                    })}
+                        ) : null;
+                    })()}
+                    {xpPotions && xpPotionCount > 0 && (
+                        <div key={xpPotions.id} className="p-4 rounded-xl flex flex-col justify-between" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
+                            <div>
+                                <h3 className="font-bold">{xpPotions.name} <span className="text-xs" style={{color: 'var(--color-text-secondary)'}}>x{xpPotionCount}</span></h3>
+                                <p className="text-sm mt-1" style={{ color: 'var(--color-text-secondary)' }}>{xpPotions.description}</p>
+                            </div>
+                            <div className="flex justify-end items-center mt-4">
+                                <button 
+                                    onClick={() => onUse(xpPotions.id)}
+                                    className="font-bold text-sm py-2 px-4 rounded-lg text-white transition"
+                                    style={{ background: 'var(--gradient-accent)' }}
+                                >
+                                    Use
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
              ) : (
                 <div className="text-center py-10 rounded-xl" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>

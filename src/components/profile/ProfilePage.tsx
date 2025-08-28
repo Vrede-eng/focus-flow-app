@@ -1,7 +1,6 @@
 
-
-import React from 'react';
-import { User } from '../../types';
+import React, { useState } from 'react';
+import { User, Clan } from '../../types';
 import { determineTitle, getPrestigeConfig } from '../../lib/levels';
 import Avatar from '../common/Avatar';
 import FireIcon from '../common/icons/FireIcon';
@@ -11,59 +10,95 @@ import PrestigeIcon from '../common/icons/PrestigeIcon';
 import { FONTS } from '../../lib/fonts';
 import AchievementsList from '../settings/AchievementsList';
 import { ACHIEVEMENTS_LIST } from '../../lib/achievements';
+import ClanBanner from '../friends/ClanBanner';
 
 interface ProfilePageProps {
     userToView: User;
     currentUser: User;
     allUsers: User[];
+    allClans: Clan[];
     onBack: () => void;
     onViewProfile: (username: string) => void;
     onStartChat: (userToChat: User) => void;
     onSendRequest: (toUsername: string) => void;
+    onInviteToClan: (username: string) => string | null;
 }
 
-const ProfilePage: React.FC<ProfilePageProps> = ({ userToView, currentUser, allUsers, onBack, onViewProfile, onStartChat, onSendRequest }) => {
+const ProfilePage: React.FC<ProfilePageProps> = ({ userToView, currentUser, allUsers, allClans, onBack, onViewProfile, onStartChat, onSendRequest, onInviteToClan }) => {
+    const [requestJustSent, setRequestJustSent] = useState(false);
     const isOwnProfile = currentUser.name === userToView.name;
     const isFriend = currentUser.friends.includes(userToView.name);
-    const canViewFullProfile = isOwnProfile || isFriend || !userToView.isPrivate;
+    // FIX: Changed isPrivate to is_private
+    const canViewFullProfile = isOwnProfile || isFriend || !userToView.is_private;
     
-    const requestSent = userToView.friendRequests?.some(req => req.from === currentUser.name);
-    const requestReceived = currentUser.friendRequests?.some(req => req.from === userToView.name);
+    // FIX: Changed friendRequests to friend_requests
+    const hasRequestAlready = userToView.friend_requests?.some(req => req.from === currentUser.name);
+    const requestSent = hasRequestAlready || requestJustSent;
+    // FIX: Changed friendRequests to friend_requests
+    const requestReceived = currentUser.friend_requests?.some(req => req.from === userToView.name);
 
     const friendsWithDetails = userToView.friends
         .map(friendName => allUsers.find(u => u.name === friendName))
         .filter((u): u is User => u !== undefined);
 
-    const displayedTitle = userToView.equippedTitle || userToView.title || determineTitle(userToView.level, userToView.prestige);
+    // FIX: Changed clanId to clan_id
+    const userClan = allClans.find(c => c.id === userToView.clan_id);
+    // FIX: Changed clanId to clan_id
+    const currentUserClan = allClans.find(c => c.id === currentUser.clan_id);
+    const isLeader = currentUserClan?.leader === currentUser.name;
+
+    // FIX: Changed clanInvites to clan_invites
+    const alreadyInvited = userToView.clan_invites?.some(inv => inv.clanId === currentUserClan?.id);
+    const [inviteSent, setInviteSent] = useState(alreadyInvited);
+
+    const handleInvite = () => {
+        const result = onInviteToClan(userToView.name);
+        if (result === null) {
+            setInviteSent(true);
+        } else {
+            alert(result); // Show error messages like "User already in a clan."
+        }
+    };
+
+    // FIX: Changed equippedTitle to equipped_title
+    const displayedTitle = userToView.equipped_title || userToView.title || determineTitle(userToView.level, userToView.prestige);
     
-    const joinDate = userToView.createdAt 
-        ? new Date(userToView.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) 
+    // FIX: Changed createdAt to created_at
+    const joinDate = userToView.created_at 
+        ? new Date(userToView.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) 
         : 'N/A';
         
     const prestigeInfo = getPrestigeConfig(userToView.prestige);
 
+    // FIX: Changed usernameColor to username_color
+    const isGold = userToView.username_color === '#FFD700';
     const usernameStyle: React.CSSProperties = {
-        color: userToView.usernameColor || 'var(--color-text-primary)',
-        fontFamily: userToView.equippedFont ? FONTS[userToView.equippedFont]?.family : 'inherit',
+        // FIX: Changed equippedFont to equipped_font
+        fontFamily: userToView.equipped_font ? FONTS[userToView.equipped_font]?.family : 'inherit',
     };
+    if (!isGold) {
+        // FIX: Changed usernameColor to username_color
+        usernameStyle.color = userToView.username_color || 'var(--color-text-primary)';
+    }
 
     const profileContainerStyle: React.CSSProperties = {
         backgroundColor: 'var(--color-bg-primary)',
     };
-    if (userToView.profileTheme?.bg) {
-        if(userToView.profileTheme.bg.startsWith('data:image')) {
-            profileContainerStyle.backgroundImage = `url(${userToView.profileTheme.bg})`;
+    // FIX: Changed profileTheme to profile_theme
+    if (userToView.profile_theme?.bg) {
+        if(userToView.profile_theme.bg.startsWith('data:image')) {
+            profileContainerStyle.backgroundImage = `url(${userToView.profile_theme.bg})`;
             profileContainerStyle.backgroundSize = 'cover';
             profileContainerStyle.backgroundPosition = 'center';
         } else {
-            profileContainerStyle.backgroundColor = userToView.profileTheme.bg;
+            profileContainerStyle.backgroundColor = userToView.profile_theme.bg;
         }
     }
 
 
     return (
         <div className="h-full flex flex-col" style={profileContainerStyle}>
-            <header className="flex-shrink-0 flex items-center p-4 z-10 sticky top-0 border-b backdrop-blur-sm" style={{ 
+            <header className="flex-shrink-0 flex items-center p-4 z-10 sticky top-0 border-b" style={{ 
                 backgroundColor: 'color-mix(in srgb, var(--color-bg-primary) 80%, transparent)',
                 borderColor: 'var(--color-bg-tertiary)'
             }}>
@@ -76,20 +111,14 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userToView, currentUser, allU
             </header>
 
             <main className="flex-grow overflow-y-auto p-6 space-y-6">
-                <div className="flex flex-col items-center text-center space-y-3 p-4 rounded-xl backdrop-blur-sm" style={{ backgroundColor: 'color-mix(in srgb, var(--color-bg-secondary) 80%, transparent)' }}>
-                    <Avatar profilePic={userToView.profilePic} equippedFrame={userToView.equippedFrame} equippedHat={userToView.equippedHat} equippedPet={userToView.equippedPet} customPetUrl={userToView.customPetUrl} className="h-24 w-24" />
+                 <div className="flex flex-col items-center text-center space-y-3 p-4 rounded-xl backdrop-blur-sm" style={{ backgroundColor: 'color-mix(in srgb, var(--color-bg-secondary) 80%, transparent)' }}>
+                    {/* FIX: Changed camelCase props to snake_case */}
+                    <Avatar profilePic={userToView.profile_pic} equippedFrame={userToView.equipped_frame} equippedHat={userToView.equipped_hat} equippedPet={userToView.equipped_pet} customPetUrl={userToView.custom_pet_url} className="h-24 w-24 border-4" style={{borderColor: 'var(--color-bg-secondary)'}} />
                     <div>
-                        <h2 className="text-2xl font-bold" style={usernameStyle}>{userToView.name}</h2>
+                        <h2 className={`text-2xl font-bold ${isGold ? 'gold-username' : ''}`} style={usernameStyle}>{userToView.name}</h2>
+                        {userClan && <p className="font-semibold text-sm" style={{color: 'var(--color-text-secondary)'}}>Clan: {userClan.name}</p>}
                         <p className="font-semibold" style={{color: 'var(--color-accent-primary)'}}>{displayedTitle}</p>
                     </div>
-                     {userToView.prestige && userToView.prestige > 0 && (
-                        <p className="text-xs font-bold px-2 py-1 rounded-md" style={{
-                            backgroundColor: 'color-mix(in srgb, var(--color-accent-primary) 30%, transparent)',
-                            color: 'var(--color-accent-primary)'
-                        }}>
-                            {prestigeInfo.multiplier}x XP & Coin Boost
-                        </p>
-                    )}
                     {userToView.status && (
                         <p className="text-sm italic break-words" style={{ color: 'var(--color-text-secondary)' }}>"{userToView.status}"</p>
                     )}
@@ -109,9 +138,23 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userToView, currentUser, allU
                         ) : requestReceived ? (
                              <button disabled style={{ background: 'var(--color-bg-tertiary)' }} className="w-full text-white font-bold py-2 px-4 rounded-xl opacity-70 cursor-not-allowed">Check Friend Requests</button>
                         ) : (
-                            <button onClick={() => onSendRequest(userToView.name)} style={{ background: 'var(--gradient-accent)' }} className="w-full text-white font-bold py-2 px-4 rounded-xl hover:opacity-90">Add Friend</button>
+                            <button onClick={() => { onSendRequest(userToView.name); setRequestJustSent(true); }} style={{ background: 'var(--gradient-accent)' }} className="w-full text-white font-bold py-2 px-4 rounded-xl hover:opacity-90">Add Friend</button>
                         )}
                         </div>
+                    )}
+                    {/* FIX: Changed clanId to clan_id */}
+                    {!isOwnProfile && isLeader && !userToView.clan_id && (
+                        <button 
+                            onClick={handleInvite} 
+                            disabled={inviteSent}
+                            className="w-full max-w-xs font-bold py-2 px-4 rounded-xl hover:opacity-80 mt-2 disabled:opacity-60 disabled:cursor-not-allowed" 
+                            style={{
+                                backgroundColor: 'var(--color-bg-tertiary)',
+                                color: inviteSent ? 'var(--color-text-secondary)' : 'var(--color-text-primary)'
+                            }}
+                        >
+                            {inviteSent ? 'Invite Sent' : 'Invite to Clan'}
+                        </button>
                     )}
                 </div>
 
@@ -146,7 +189,8 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userToView, currentUser, allU
                                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                                     {friendsWithDetails.slice(0, 8).map(friend => (
                                         <button key={friend.name} onClick={() => onViewProfile(friend.name)} className="flex flex-col items-center text-center space-y-2 hover:opacity-80 transition-opacity">
-                                            <Avatar profilePic={friend.profilePic} equippedFrame={friend.equippedFrame} className="h-16 w-16" />
+                                            {/* FIX: Changed camelCase props to snake_case */}
+                                            <Avatar profilePic={friend.profile_pic} equippedFrame={friend.equipped_frame} className="h-16 w-16" />
                                             <p className="text-sm font-semibold truncate w-full">{friend.name}</p>
                                         </button>
                                     ))}

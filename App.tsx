@@ -1,6 +1,4 @@
 
-
-
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { GoogleGenAI, Content, GenerateContentResponse } from "@google/genai";
 import LoginPage from './components/auth/LoginPage';
@@ -111,24 +109,55 @@ const App: React.FC = () => {
                 // --- OFFLINE MODE ---
                 console.log("No Supabase client. Running in OFFLINE mode.");
                 setIsOnline(false);
-                let users: User[], clans: Clan[], messages: ChatMessage[], clanMessages: ClanChatMessage[];
+                let users: User[] = [], clans: Clan[] = [], messages: ChatMessage[] = [], clanMessages: ClanChatMessage[] = [];
                 let initialSaveNeeded = false;
-                
-                const storedUsersJSON = localStorage.getItem('focusFlowUsers');
-                const storedClansJSON = localStorage.getItem('focusFlowClans');
-                const storedMessagesJSON = localStorage.getItem('focusFlowMessages');
-                const storedClanMessagesJSON = localStorage.getItem('focusFlowClanMessages');
 
-                if (!storedUsersJSON || JSON.parse(storedUsersJSON).length === 0) {
-                    users = [createAdminUser()]; initialSaveNeeded = true;
-                } else {
-                    users = JSON.parse(storedUsersJSON);
-                    if (!users.some(u => u.isAdmin)) { users.push(createAdminUser()); initialSaveNeeded = true; }
+                try {
+                    const storedUsersJSON = localStorage.getItem('focusFlowUsers');
+                    if (storedUsersJSON) {
+                        const parsedUsers = JSON.parse(storedUsersJSON);
+                        if (Array.isArray(parsedUsers) && parsedUsers.length > 0) {
+                            users = parsedUsers;
+                            if (!users.some(u => u.isAdmin)) {
+                                users.push(createAdminUser());
+                                initialSaveNeeded = true;
+                            }
+                        } else {
+                            users = [createAdminUser()];
+                            initialSaveNeeded = true;
+                        }
+                    } else {
+                        users = [createAdminUser()];
+                        initialSaveNeeded = true;
+                    }
+                } catch (error) {
+                    console.error("Error parsing users from localStorage. Resetting users.", error);
+                    users = [createAdminUser()];
+                    initialSaveNeeded = true;
+                    localStorage.removeItem('focusFlowUsers');
                 }
-                
-                clans = storedClansJSON ? JSON.parse(storedClansJSON) : [];
-                messages = storedMessagesJSON ? JSON.parse(storedMessagesJSON) : [];
-                clanMessages = storedClanMessagesJSON ? JSON.parse(storedClanMessagesJSON) : [];
+
+                try {
+                    const storedClansJSON = localStorage.getItem('focusFlowClans');
+                    clans = storedClansJSON ? JSON.parse(storedClansJSON) : [];
+                } catch (error) {
+                    console.error("Error parsing clans from localStorage. Resetting clans.", error);
+                    localStorage.removeItem('focusFlowClans');
+                }
+                try {
+                    const storedMessagesJSON = localStorage.getItem('focusFlowMessages');
+                    messages = storedMessagesJSON ? JSON.parse(storedMessagesJSON) : [];
+                } catch (error) {
+                    console.error("Error parsing messages from localStorage. Resetting messages.", error);
+                    localStorage.removeItem('focusFlowMessages');
+                }
+                try {
+                    const storedClanMessagesJSON = localStorage.getItem('focusFlowClanMessages');
+                    clanMessages = storedClanMessagesJSON ? JSON.parse(storedClanMessagesJSON) : [];
+                } catch (error) {
+                    console.error("Error parsing clan messages from localStorage. Resetting clan messages.", error);
+                    localStorage.removeItem('focusFlowClanMessages');
+                }
                 
                 const yesterdayForTimezone = (tz?: string): string => { const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1); return getLocalDateString(tz, yesterday); };
 
@@ -156,16 +185,21 @@ const App: React.FC = () => {
                 
                 const loggedInUserJSON = sessionStorage.getItem('focusFlowLoggedInUser');
                 if (loggedInUserJSON) {
-                    const loggedInUser = JSON.parse(loggedInUserJSON);
-                    const fullUserFromStorage = verifiedUsers.find(u => u.name === loggedInUser.name);
-                    if (fullUserFromStorage) {
-                        const { password, ...userToSet } = fullUserFromStorage; setUser(userToSet);
-                        const unread = new Set<string>(); messages.forEach(msg => { if (msg.to_name === loggedInUser.name && !msg.read) unread.add(msg.from_name); }); setUnreadSenders(unread);
-                        const storedPlannerMessages = localStorage.getItem('focusFlowPlannerMessages'); if (storedPlannerMessages) setPlannerMessages(JSON.parse(storedPlannerMessages));
-                        const storedCoachMessages = localStorage.getItem('focusFlowCoachMessages'); if (storedCoachMessages) setCoachMessages(JSON.parse(storedCoachMessages));
-                        const storedAnswerBotMessages = localStorage.getItem('focusFlowAnswerBotMessages'); if (storedAnswerBotMessages) setAnswerBotMessages(JSON.parse(storedAnswerBotMessages));
-                        const storedHelperBotMessages = localStorage.getItem('focusFlowHelperBotMessages'); if (storedHelperBotMessages) setHelperBotMessages(JSON.parse(storedHelperBotMessages));
-                        const storedCoachMood = localStorage.getItem('focusFlowCoachMood'); if (storedCoachMood) setCoachMood(storedCoachMood as CoachMood);
+                    try {
+                        const loggedInUser = JSON.parse(loggedInUserJSON);
+                        const fullUserFromStorage = verifiedUsers.find(u => u.name === loggedInUser.name);
+                        if (fullUserFromStorage) {
+                            const { password, ...userToSet } = fullUserFromStorage; setUser(userToSet);
+                            const unread = new Set<string>(); messages.forEach(msg => { if (msg.to_name === loggedInUser.name && !msg.read) unread.add(msg.from_name); }); setUnreadSenders(unread);
+                            try { const storedPlannerMessages = localStorage.getItem('focusFlowPlannerMessages'); if (storedPlannerMessages) setPlannerMessages(JSON.parse(storedPlannerMessages)); } catch (e) { console.error('Failed to parse planner messages'); }
+                            try { const storedCoachMessages = localStorage.getItem('focusFlowCoachMessages'); if (storedCoachMessages) setCoachMessages(JSON.parse(storedCoachMessages)); } catch (e) { console.error('Failed to parse coach messages'); }
+                            try { const storedAnswerBotMessages = localStorage.getItem('focusFlowAnswerBotMessages'); if (storedAnswerBotMessages) setAnswerBotMessages(JSON.parse(storedAnswerBotMessages)); } catch (e) { console.error('Failed to parse answer bot messages'); }
+                            try { const storedHelperBotMessages = localStorage.getItem('focusFlowHelperBotMessages'); if (storedHelperBotMessages) setHelperBotMessages(JSON.parse(storedHelperBotMessages)); } catch (e) { console.error('Failed to parse helper bot messages'); }
+                            const storedCoachMood = localStorage.getItem('focusFlowCoachMood'); if (storedCoachMood) setCoachMood(storedCoachMood as CoachMood);
+                        }
+                    } catch (error) {
+                         console.error("Error parsing logged in user from sessionStorage.", error);
+                         sessionStorage.removeItem('focusFlowLoggedInUser');
                     }
                 }
             }
@@ -288,7 +322,5 @@ const App: React.FC = () => {
         </div>
     );
 };
-
-// Fix: Removed dummy component declarations that conflicted with imports.
 
 export default App;
