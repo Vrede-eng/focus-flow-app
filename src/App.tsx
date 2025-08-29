@@ -1,5 +1,7 @@
 
+
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
+// FIX: Removed unused 'Content' type from import.
 import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 import LoginPage from './components/auth/LoginPage';
 import SignupPage from './components/auth/SignupPage';
@@ -63,7 +65,7 @@ const App: React.FC = () => {
     const [clanMessages, setClanMessages] = useState<ClanChatMessage[]>([]);
     const [chattingInClan, setChattingInClan] = useState<Clan | null>(null);
     
-    const [isOnline, setIsOnline] = useState(false);
+    const [isOnline, setIsOnline] = useState(!!supabase);
     const [isLoading, setIsLoading] = useState(true);
 
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
@@ -285,8 +287,8 @@ const App: React.FC = () => {
                     // It requires a service_role key which should never be exposed.
                     // await supabase.auth.admin.deleteUser(data.user.id);
                     console.error("Failed to create user profile after auth signup:", insertError);
-                    // FIX: Safely convert error message to string.
-                    return `Failed to create profile: ${String(insertError.message)}. Please contact support.`;
+                    // FIX: Safely convert error message to string by casting to Error.
+                    return `Failed to create profile: ${String((insertError as Error).message)}. Please contact support.`;
                 }
                 setUser(newUser);
                 setAllUsers(prev => [...prev, newUser]);
