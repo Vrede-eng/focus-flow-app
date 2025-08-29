@@ -1,5 +1,4 @@
 
-
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 // FIX: Removed unused 'Content' type from import.
 import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
@@ -74,7 +73,7 @@ const App: React.FC = () => {
     
     useEffect(() => {
         const initializeApp = async () => {
-            setIsLoading(true);
+            // No need to set isLoading(true) here as it's the default state
             if (supabase) {
                 // --- ONLINE MODE ---
                 console.log("Supabase client detected. Running in ONLINE mode.");
@@ -283,12 +282,11 @@ const App: React.FC = () => {
                 };
                 const { error: insertError } = await supabase.from('users').insert(newUser);
                 if (insertError) {
-                    // CRITICAL FIX: The line below is a major security risk and will fail on the client.
-                    // It requires a service_role key which should never be exposed.
-                    // await supabase.auth.admin.deleteUser(data.user.id);
                     console.error("Failed to create user profile after auth signup:", insertError);
-                    // FIX: Safely convert error message to string by casting to Error.
-                    return `Failed to create profile: ${String((insertError as Error).message)}. Please contact support.`;
+                    // FIX: Safely access the error message property. The error object from the client
+                    // might not be a standard Error instance, causing type issues.
+                    const errorMessage = (insertError as any)?.message || 'An unknown error occurred';
+                    return `Failed to create profile: ${errorMessage}. Please contact support.`;
                 }
                 setUser(newUser);
                 setAllUsers(prev => [...prev, newUser]);
@@ -312,7 +310,101 @@ const App: React.FC = () => {
         }
     };
     
-    // ... all other handlers remain the same ...
+    const handleLogout = () => {
+        updateUser(null);
+    };
+
+    const handleLogHours = (hours: number) => {
+        if (!user) return;
+    
+        const prestigeInfo = getPrestigeConfig(user.prestige);
+        const xpGained = Math.round(hours * 100 * prestigeInfo.multiplier);
+        const coinsGained = Math.round(hours * 10 * prestigeInfo.multiplier);
+        let newXp = user.xp + xpGained;
+        let newCoins = (user.coins || 0) + coinsGained;
+    
+        const today = getLocalDateString(user.timezone);
+        const newStudyLog = [...user.study_log];
+        const todayLogIndex = newStudyLog.findIndex(log => log.date === today);
+        if (todayLogIndex > -1) {
+            newStudyLog[todayLogIndex].hours += hours;
+        } else {
+            newStudyLog.push({ date: today, hours });
+        }
+    
+        let newStreak = user.streak;
+        if (user.last_studied_date !== today) {
+            const yesterday = getLocalDateString(user.timezone, new Date(Date.now() - 86400000));
+            newStreak = user.last_studied_date === yesterday ? newStreak + 1 : 1;
+        }
+    
+        let newLevel = user.level;
+        let didLevelUp = false;
+        while (newXp >= totalXpToReachLevel(newLevel + 1)) {
+            newLevel++;
+            didLevelUp = true;
+        }
+    
+        if (didLevelUp) {
+            setNotification({
+                title: "Level Up!",
+                message: `Congratulations! You've reached Level ${newLevel}. You earned 100 coins!`
+            });
+            newCoins += 100;
+        }
+        
+        const updatedUser: User = {
+            ...user,
+            xp: newXp,
+            level: newLevel,
+            streak: newStreak,
+            last_studied_date: today,
+            study_log: newStudyLog,
+            coins: newCoins,
+        };
+    
+        updateUser(updatedUser);
+    };
+
+    const handleViewProfile = (username?: string) => {
+        const userToView = username ? allUsers.find(u => u.name === username) : user;
+        if (userToView) {
+            setViewingProfile(userToView);
+        }
+    };
+    
+    const renderActiveTab = () => {
+        if (!user) return null;
+        switch (activeTab) {
+            case Tab.Home:
+                return <HomePage user={user} onLogHours={handleLogHours} onLogout={handleLogout} onViewProfile={() => handleViewProfile()} />;
+            case Tab.Challenges:
+                 return <ChallengesPage currentUser={user} />;
+            case Tab.Friends:
+                // Dummy handlers for now, to be implemented
+                return <FriendsPage currentUser={user} allUsers={allUsers} allClans={allClans} unreadClanMessages={false} onSendRequest={() => {}} onRespondRequest={() => {}} onViewProfile={handleViewProfile} onStartChat={() => {}} unreadSenders={unreadSenders} onCreateClan={async () => null} onInviteToClan={() => null} onRespondToClanInvite={() => {}} onLeaveClan={() => {}} onKickFromClan={() => {}} onUpdateClanName={() => {}} onUpdateClanBanner={() => {}} onStartClanChat={() => {}} />;
+            case Tab.AIAssistant:
+                return <AIAssistantPage currentUser={user} isLoading={isAiLoading} coachMood={coachMood} onSetCoachMood={setCoachMood} plannerMessages={plannerMessages} coachMessages={coachMessages} answerBotMessages={answerBotMessages} helperBotMessages={helperBotMessages} onSendPlannerMessage={() => {}} onSendCoachMessage={() => {}} onSendAnswerBotMessage={() => {}} onSendHelperBotMessage={() => {}} onResetPlannerChat={() => {}} onResetCoachChat={() => {}} onResetAnswerBotChat={() => {}} onResetHelperBotChat={() => {}} onPlannerFileUpload={() => {}} onCoachFileUpload={() => {}} onAnswerBotFileUpload={() => {}} onHelperBotFileUpload={() => {}} plannerFile={plannerFile} coachFile={coachFile} answerBotFile={answerBotFile} helperBotFile={helperBotFile} onRemovePlannerFile={() => {}} onRemoveCoachFile={() => {}} onRemoveAnswerBotFile={() => {}} onRemoveHelperBotFile={() => {}} />;
+            case Tab.Leaderboards:
+                return <LeaderboardsPage currentUser={user} allUsers={allUsers} allClans={allClans} onViewProfile={handleViewProfile} />;
+            case Tab.Shop:
+                return <ShopPage currentUser={user} onPurchase={() => {}} onUse={() => {}} />;
+            case Tab.Settings:
+                return <SettingsPage currentUser={user} onViewProfile={() => handleViewProfile()} onUpdateProfilePic={() => {}} onUpdateTimezone={() => {}} onUpdateTheme={() => {}} onUpdateStatus={() => {}} onUpdatePrivacy={() => {}} onEquipTitle={() => {}} onEquipFrame={() => {}} onUpdateName={async () => null} onUpdatePassword={async () => null} onUpdateHat={() => {}} onEquipPet={() => {}} onUpdateCustomPet={() => {}} onUpdateProfileTheme={() => {}} onEquipFont={() => {}} onUpdateUsernameColor={() => {}} />;
+            case Tab.Admin:
+                return user.isAdmin ? <AdminPage currentUser={user} allUsers={allUsers} allClans={allClans} onDeleteUser={() => {}} onResetUser={() => {}} onUpdateUserStats={() => {}} onDeleteClan={() => {}} /> : <HomePage user={user} onLogHours={handleLogHours} onLogout={handleLogout} onViewProfile={() => handleViewProfile()} />;
+            default:
+                return <HomePage user={user} onLogHours={handleLogHours} onLogout={handleLogout} onViewProfile={() => handleViewProfile()} />;
+        }
+    };
+    
+    if (isLoading) {
+        return (
+            <div className="h-full flex items-center justify-center" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
+                <div className="w-16 h-16 border-4 border-t-transparent rounded-full animate-spin" style={{borderColor: 'var(--color-accent-primary)'}}></div>
+            </div>
+        );
+    }
 
     if (!user) {
         return authScreen === 'login'
@@ -320,10 +412,23 @@ const App: React.FC = () => {
             : <SignupPage onSignup={handleSignup} switchToLogin={() => setAuthScreen('login')} isOnline={isOnline} />;
     }
 
-    // ... The rest of the component ...
+    if (viewingProfile) {
+        return <ProfilePage userToView={viewingProfile} currentUser={user} allUsers={allUsers} allClans={allClans} onBack={() => setViewingProfile(null)} onViewProfile={handleViewProfile} onStartChat={()=>{}} onSendRequest={()=>{}} onInviteToClan={() => null} />;
+    }
+    
+    // Main App View
     return (
         <div className="h-full flex flex-col md:flex-row" style={{ backgroundColor: 'var(--color-bg-primary)', color: 'var(--color-text-primary)' }}>
-            <p>Implement the rest of your app here</p>
+            <SideNav activeTab={activeTab} setActiveTab={setActiveTab} currentUser={user} onLogout={handleLogout} onViewProfile={() => handleViewProfile()} hasNotifications={unreadSenders.size > 0} />
+            <main className="flex-1 flex flex-col overflow-hidden">
+                <div className="flex-1 overflow-y-auto">
+                    {renderActiveTab()}
+                </div>
+                <div className="md:hidden flex-shrink-0">
+                    <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} currentUser={user} hasNotifications={unreadSenders.size > 0} />
+                </div>
+            </main>
+             {notification && <NotificationModal title={notification.title} message={notification.message} onClose={() => setNotification(null)} />}
         </div>
     );
 };

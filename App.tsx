@@ -1,6 +1,6 @@
 
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
-import { GoogleGenAI, Content, GenerateContentResponse } from "@google/genai";
+import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 import LoginPage from './components/auth/LoginPage';
 import SignupPage from './components/auth/SignupPage';
 import HomePage from './components/home/HomePage';
@@ -285,8 +285,10 @@ const App: React.FC = () => {
                     // It requires a service_role key which should never be exposed.
                     // await supabase.auth.admin.deleteUser(data.user.id);
                     console.error("Failed to create user profile after auth signup:", insertError);
-                    // FIX: Safely convert error message to string.
-                    return `Failed to create profile: ${String(insertError.message)}. Please contact support.`;
+                    // FIX: Safely access the error message property. The error object from the client
+                    // might not be a standard Error instance, causing type issues.
+                    const errorMessage = (insertError as any)?.message || 'An unknown error occurred';
+                    return `Failed to create profile: ${errorMessage}. Please contact support.`;
                 }
                 setUser(newUser);
                 setAllUsers(prev => [...prev, newUser]);

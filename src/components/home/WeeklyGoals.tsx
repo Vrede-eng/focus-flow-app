@@ -76,4 +76,18 @@ const WeeklyGoals: React.FC<WeeklyGoalsProps> = ({ user }) => {
                             </div>
                             <div className={`text-sm leading-tight flex-1 ${goal.completed ? 'line-through opacity-70' : ''}`} style={{ color: 'var(--color-text-primary)' }}>
                                 {goal.text}
-                                <span className="text-xs font-bold" style={{color: 'var(--color-accent-primary)'}}> (+
+                                <span className="text-xs font-bold" style={{color: 'var(--color-accent-primary)'}}> (+{goal.xp} XP)</span>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+            ) : (
+                <p className="text-sm text-center py-4" style={{ color: 'var(--color-text-secondary)' }}>
+                    Your weekly goals will appear here soon.
+                </p>
+            )}
+        </div>
+    );
+};
+
+export default WeeklyGoals;

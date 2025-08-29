@@ -1,5 +1,4 @@
 
-
 import React, { useState, useMemo } from 'react';
 import AgreementModal from '../common/AgreementModal';
 
@@ -113,3 +112,60 @@ const SignupPage: React.FC<SignupPageProps> = ({ onSignup, switchToLogin, isOnli
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="Password (min. 6 characters)"
                             className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition"
+                             style={{
+                                backgroundColor: 'var(--color-bg-secondary)', 
+                                color: 'var(--color-text-primary)',
+                                borderColor: hasError ? '#f43f5e' : 'var(--color-bg-tertiary)',
+                            }}
+                            required
+                            disabled={isLoading || !isOnline}
+                        />
+                    </div>
+                     <div>
+                        <input
+                            type="password"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            placeholder="Confirm Password"
+                            className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition"
+                             style={{
+                                backgroundColor: 'var(--color-bg-secondary)', 
+                                color: 'var(--color-text-primary)',
+                                borderColor: hasError ? '#f43f5e' : 'var(--color-bg-tertiary)',
+                            }}
+                            required
+                            disabled={isLoading || !isOnline}
+                        />
+                    </div>
+                    {error && !nameError && (
+                        <p className="text-red-500 text-sm text-center bg-red-500/10 p-2 rounded-lg">
+                            {error}
+                        </p>
+                    )}
+                    <button
+                        type="submit"
+                        style={{ background: 'var(--gradient-accent)' }}
+                        className="w-full text-white font-bold py-3 px-4 rounded-xl hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={isLoading || !isOnline}
+                    >
+                        {isLoading ? 'Creating Account...' : 'Sign Up'}
+                    </button>
+                </form>
+                <p className="text-center text-sm mt-8" style={{ color: 'var(--color-text-secondary)' }}>
+                    Already have an account?{' '}
+                     <button onClick={switchToLogin} className="font-semibold hover:opacity-80" style={{color: 'var(--color-accent-primary)'}}>
+                        Sign In
+                    </button>
+                </p>
+            </div>
+            {showAgreement && (
+                <AgreementModal 
+                    isOpen={showAgreement} 
+                    onAgree={handleAgreeAndSignup} 
+                />
+            )}
+        </div>
+    );
+};
+
+export default SignupPage;
