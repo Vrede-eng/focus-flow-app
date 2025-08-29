@@ -285,7 +285,8 @@ const App: React.FC = () => {
                     // It requires a service_role key which should never be exposed.
                     // await supabase.auth.admin.deleteUser(data.user.id);
                     console.error("Failed to create user profile after auth signup:", insertError);
-                    return `Failed to create profile: ${insertError.message as string}. Please contact support.`;
+                    // FIX: Safely convert error message to string.
+                    return `Failed to create profile: ${String(insertError.message)}. Please contact support.`;
                 }
                 setUser(newUser);
                 setAllUsers(prev => [...prev, newUser]);
