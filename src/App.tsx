@@ -1,6 +1,7 @@
 
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
-import { GoogleGenAI, Content, GenerateContentResponse } from "@google/genai";
+// FIX: Removed unused 'Content' import.
+import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 import LoginPage from './components/auth/LoginPage';
 import SignupPage from './components/auth/SignupPage';
 import HomePage from './components/home/HomePage';
@@ -280,12 +281,14 @@ const App: React.FC = () => {
                     unlocks: [ 'theme-blue', 'theme-emerald', 'theme-rose', 'theme-violet', 'theme-amber', 'avatar-1', 'avatar-2', 'avatar-3', 'avatar-4', 'avatar-5' ],
                 };
                 const { error: insertError } = await supabase.from('users').insert(newUser);
+                // FIX: The `deleteUser` admin API call was removed as it is a security risk on the client-side
+                // and requires a service_role key, which would cause the application to fail.
+                // The logic for handling orphaned auth users should be implemented on the backend.
+                // This change also resolves the TypeScript errors.
                 if (insertError) {
-                    // Attempt to delete the auth user if profile insertion fails
-                    // FIX: Cast `data.user.id` to string as it is inferred as 'unknown'.
-                    await supabase.auth.admin.deleteUser(data.user.id as string);
-                    // FIX: Cast `insertError.message` to string as it is inferred as 'unknown'.
-                    return `Failed to create profile: ${insertError.message as string}`;
+                    console.error("Failed to create user profile after auth signup:", insertError);
+                    // The user-facing error message should not expose implementation details.
+                    return `Failed to create your profile. Please contact support.`;
                 }
                 setUser(newUser);
                 setAllUsers(prev => [...prev, newUser]);

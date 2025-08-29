@@ -281,9 +281,11 @@ const App: React.FC = () => {
                 };
                 const { error: insertError } = await supabase.from('users').insert(newUser);
                 if (insertError) {
-                    // Attempt to delete the auth user if profile insertion fails
-                    await supabase.auth.admin.deleteUser(data.user.id);
-                    return `Failed to create profile: ${insertError.message}`;
+                    // CRITICAL FIX: The line below is a major security risk and will fail on the client.
+                    // It requires a service_role key which should never be exposed.
+                    // await supabase.auth.admin.deleteUser(data.user.id);
+                    console.error("Failed to create user profile after auth signup:", insertError);
+                    return `Failed to create profile: ${insertError.message as string}. Please contact support.`;
                 }
                 setUser(newUser);
                 setAllUsers(prev => [...prev, newUser]);
